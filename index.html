@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ModeStyle - Vêtements & Accessoires</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50">
+
+<!-- Header avec navigation responsive -->
+<header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <!-- Ligne supérieure -->
+        <div class="flex justify-between items-center flex-wrap gap-3">
+            <!-- Logo + menu mobile -->
+            <div class="flex items-center gap-3">
+                <button id="mobileMenuBtn" class="lg:hidden text-2xl hover:text-green-200">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="index.html" class="text-xl md:text-2xl font-bold">ModeStyle</a>
+            </div>
+
+            <!-- Navigation desktop -->
+            <nav class="hidden lg:flex space-x-5 text-sm">
+                <a href="index.html" class="hover:text-green-200">Accueil</a>
+                <a href="pages/vetements.html" class="hover:text-green-200">Vêtements</a>
+                <a href="pages/chaussures.html" class="hover:text-green-200">Chaussures</a>
+                <a href="pages/accessoires.html" class="hover:text-green-200">Accessoires</a>
+                <a href="pages/lingerie.html" class="hover:text-green-200">Lingerie</a>
+                <a href="pages/promos.html" class="hover:text-green-200 text-yellow-300">Promos</a>
+                <a href="pages/nouveautes.html" class="hover:text-green-200">Nouveautés</a>
+            </nav>
+
+            <!-- Actions utilisateur -->
+            <div class="flex items-center gap-4">
+                <div class="relative hidden md:block">
+                    <input type="text" id="searchInput" placeholder="Rechercher..." 
+                           class="px-4 py-1.5 rounded-full text-gray-800 w-48 lg:w-64 text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+                    <i class="fas fa-search absolute right-3 top-2 text-gray-400 text-sm"></i>
+                </div>
+                <a href="pages/favoris.html" class="relative hover:text-green-200">
+                    <i class="far fa-heart text-xl"></i>
+                    <span id="favCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+                <a href="pages/cart.html" class="relative hover:text-green-200">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+                <div class="relative">
+                    <button id="userBtn" class="flex items-center gap-1 hover:text-green-200">
+                        <i class="far fa-user-circle text-2xl"></i>
+                        <i class="fas fa-chevron-down text-xs hidden md:inline"></i>
+                    </button>
+                    <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl hidden z-50">
+                        <div id="userInfo" class="px-4 py-2 border-b text-gray-700 text-sm"></div>
+                        <a href="pages/moncompte.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mon compte</a>
+                        <a href="pages/commandes.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mes commandes</a>
+                        <a href="pages/favoris.html" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Mes favoris</a>
+                        <hr class="my-1">
+                        <a href="#" id="logoutBtn" class="block px-4 py-2 text-red-600 hover:bg-gray-100">Déconnexion</a>
+                        <a href="pages/login.html" id="loginLink" class="block px-4 py-2 text-green-600 hover:bg-gray-100">Connexion</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile search -->
+        <div class="md:hidden mt-3">
+            <input type="text" id="mobileSearch" placeholder="Rechercher un produit..." 
+                   class="w-full px-4 py-2 rounded-full text-gray-800 text-sm focus:outline-none">
+        </div>
+    </div>
+
+    <!-- Menu mobile -->
+    <div id="mobileMenu" class="hidden lg:hidden bg-green-800 py-2">
+        <div class="container mx-auto px-4 flex flex-col space-y-1">
+            <a href="index.html" class="py-2 hover:bg-green-600 px-3 rounded">Accueil</a>
+            <a href="pages/vetements.html" class="py-2 hover:bg-green-600 px-3 rounded">Vêtements</a>
+            <a href="pages/chaussures.html" class="py-2 hover:bg-green-600 px-3 rounded">Chaussures</a>
+            <a href="pages/accessoires.html" class="py-2 hover:bg-green-600 px-3 rounded">Accessoires</a>
+            <a href="pages/lingerie.html" class="py-2 hover:bg-green-600 px-3 rounded">Lingerie</a>
+            <a href="pages/promos.html" class="py-2 hover:bg-green-600 px-3 rounded text-yellow-300">Promos</a>
+            <a href="pages/nouveautes.html" class="py-2 hover:bg-green-600 px-3 rounded">Nouveautés</a>
+            <a href="pages/livraison.html" class="py-2 hover:bg-green-600 px-3 rounded">Livraison</a>
+            <a href="pages/contact.html" class="py-2 hover:bg-green-600 px-3 rounded">Contact</a>
+            <a href="pages/about.html" class="py-2 hover:bg-green-600 px-3 rounded">À propos</a>
+        </div>
+    </div>
+</header>
+
+<!-- Hero Slider -->
+<div class="relative h-56 sm:h-80 md:h-96 overflow-hidden">
+    <div class="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=500&fit=crop" 
+             class="slider-img absolute w-full h-full object-cover transition-opacity duration-700 opacity-100">
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=500&fit=crop" 
+             class="slider-img absolute w-full h-full object-cover transition-opacity duration-700 opacity-0">
+        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&h=500&fit=crop" 
+             class="slider-img absolute w-full h-full object-cover transition-opacity duration-700 opacity-0">
+    </div>
+    <button id="prevSlide" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <button id="nextSlide" class="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
+
+<main class="container mx-auto px-4 py-6 md:py-8">
+
+    <!-- Bienvenue -->
+    <div class="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-4 md:p-6 mb-8 text-center">
+        <h2 class="text-xl md:text-2xl font-bold text-green-800">Bienvenue sur ModeStyle !</h2>
+        <p class="text-gray-700 mt-1">Découvrez notre collection exclusive de vêtements et accessoires</p>
+        <p id="welcomeMsg" class="text-green-700 font-semibold mt-2"></p>
+    </div>
+
+    <!-- Section Homme -->
+    <section class="mb-10">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-mars text-blue-500"></i> Homme
+            </h2>
+            <a href="pages/vetements.html?cat=homme" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div id="productsHomme" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+            <!-- Chargement via JS -->
+        </div>
+    </section>
+
+    <!-- Section Femme -->
+    <section class="mb-10">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-venus text-pink-500"></i> Femme
+            </h2>
+            <a href="pages/vetements.html?cat=femme" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div id="productsFemme" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        </div>
+    </section>
+
+    <!-- Section Promotions -->
+    <section class="mb-10">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-tag text-red-500"></i> Promotions
+            </h2>
+            <a href="pages/promos.html" class="text            <a href="pages/promos.html" class="text-red-600 hover:text-red-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div id="productsPromo" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        </div>
+    </section>
+
+    <!-- Section Nouveautés -->
+    <section class="mb-10">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-star text-yellow-500"></i> Nouveautés
+            </h2>
+            <a href="pages/nouveautes.html" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
+        </div>
+        <div id="productsNew" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="bg-green-700 rounded-xl p-6 md:p-8 text-center text-white mt-8">
+        <h3 class="text-xl md:text-2xl font-bold mb-2">Abonnez-vous à notre newsletter</h3>
+        <p class="mb-4 text-sm md:text-base">Recevez nos offres exclusives et nouveautés directement dans votre boîte mail</p>
+        <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <input type="email" id="newsletterEmail" placeholder="Votre email" 
+                   class="px-4 py-2 rounded-full text-gray-800 flex-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <button onclick="subscribeNewsletter()" class="bg-yellow-500 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition">
+                S'abonner
+            </button>
+        </div>
+    </section>
+</main>
+
+<!-- Footer -->
+<footer class="bg-gray-900 text-gray-400 mt-12">
+    <div class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div>
+                <h3 class="text-white font-bold text-lg mb-3">ModeStyle</h3>
+                <p class="text-sm">Votre boutique en ligne de vêtements et accessoires de qualité au Cameroun.</p>
+                <div class="flex gap-3 mt-4">
+                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-3">Liens rapides</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="index.html" class="hover:text-white">Accueil</a></li>
+                    <li><a href="pages/vetements.html" class="hover:text-white">Vêtements</a></li>
+                    <li><a href="pages/chaussures.html" class="hover:text-white">Chaussures</a></li>
+                    <li><a href="pages/accessoires.html" class="hover:text-white">Accessoires</a></li>
+                    <li><a href="pages/promos.html" class="hover:text-white">Promotions</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-3">Information</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="pages/livraison.html" class="hover:text-white">Livraison & retour</a></li>
+                    <li><a href="pages/contact.html" class="hover:text-white">Contact</a></li>
+                    <li><a href="pages/about.html" class="hover:text-white">À propos</a></li>
+                    <li><a href="#" class="hover:text-white">Conditions générales</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-3">Contact</h3>
+                <ul class="space-y-2 text-sm">
+                    <li><i class="fas fa-phone mr-2"></i> +237 6 95 76 79 26</li>
+                    <li><i class="fas fa-envelope mr-2"></i> contact@modestyle.com</li>
+                    <li><i class="fas fa-map-marker-alt mr-2"></i> Ngaoundéré, Cameroun</li>
+                </ul>
+                <div class="mt-4">
+                    <a href="https://wa.me/237695767926" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-full text-sm hover:bg-green-700 transition">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="border-t border-gray-800 mt-6 pt-4 text-center text-gray-500 text-xs">
+            <p>&copy; 2026 ModeStyle - Tous droits réservés</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/cart.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
