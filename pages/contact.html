@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - ModeStyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-100">
+
+<header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
+            <a href="../index.html" class="hover:text-green-200">
+                <i class="fas fa-home"></i> Accueil
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Contactez-nous</h1>
+    
+    <div class="grid md:grid-cols-3 gap-6">
+        <!-- Informations de contact -->
+        <div class="md:col-span-1 space-y-4">
+            <div class="bg-white rounded-xl shadow-md p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Adresse</h3>
+                </div>
+                <p class="text-gray-600 text-sm">Ngaoundéré, Cameroun<br>Quartier Domayo, Rue Principale</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-phone text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Téléphone</h3>
+                </div>
+                <p class="text-gray-600 text-sm">+237 6 95 76 79 26<br>+237 6 XX XX XX XX</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-envelope text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Email</h3>
+                </div>
+                <p class="text-gray-600 text-sm">contact@modestyle.com<br>serviceclient@modestyle.com</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clock text-green-600"></i>
+                    </div>
+                    <h3 class="font-semibold text-gray-800">Horaires</h3>
+                </div>
+                <p class="text-gray-600 text-sm">Lundi - Vendredi: 8h - 18h<br>Samedi: 9h - 15h<br>Dimanche: Fermé</p>
+            </div>
+        </div>
+        
+        <!-- Formulaire de contact -->
+        <div class="md:col-span-2">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Envoyez-nous un message</h2>
+                
+                <form id="contactForm">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Nom complet</label>
+                            <input type="text" id="name" required 
+                                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="email" required 
+                                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Téléphone</label>
+                        <input type="tel" id="phone" 
+                               class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Sujet</label>
+                        <select id="subject" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                            <option value="commande">Question sur ma commande</option>
+                            <option value="retour">Retour produit</option>
+                            <option value="livraison">Livraison</option>
+                            <option value="produit">Information produit</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-semibold mb-2">Message</label>
+                        <textarea id="message" rows="5" required 
+                                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="bg-green-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-800 transition">
+                        <i class="fas fa-paper-plane"></i> Envoyer le message
+                    </button>
+                </form>
+                
+                <div id="formSuccess" class="mt-4 text-green-600 text-sm hidden"></div>
+                <div id="formError" class="mt-4 text-red-600 text-sm hidden"></div>
+            </div>
+            
+            <!-- Carte -->
+            <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+                <h3 class="font-semibold text-gray-800 mb-3">Notre emplacement</h3>
+                <div class="bg-gray-200 rounded-lg h-48 flex items-center justify-center">
+                    <div class="text-center">
+                        <i class="fas fa-map-marked-alt text-4xl text-green-600 mb-2"></i>
+                        <p class="text-gray-500">Carte interactive - Ngaoundéré, Cameroun</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script src="../js/auth.js"></script>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    
+    // Simulation d'envoi - Dans un vrai projet, appeler une API
+    // await apiRequest('/contact', 'POST', { name, email, phone, subject, message });
+    
+    showToast('Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+    
+    document.getElementById('contactForm').reset();
+});
+
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed bottom-4 right-4 z-50 ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm toast-slide`;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 4000);
+}
+</script>
+</body>
+</html>

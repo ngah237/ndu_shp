@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon panier - ModeStyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-100">
+
+<header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <a href="../index.html"            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="hover:text-green-200">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+                <a href="favoris.html" class="hover:text-green-200 relative">
+                    <i class="far fa-heart text-xl"></i>
+                    <span id="favCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Mon panier</h1>
+    
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Liste des produits -->
+        <div class="lg:w-2/3">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full responsive-table">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-3 text-left">Produit</th>
+                                <th class="p-3 text-center">Prix</th>
+                                <th class="p-3 text-center">Quantité</th>
+                                <th class="p-3 text-center">Total</th>
+                                <th class="p-3 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cartItems">
+                            <tr>
+                                <td colspan="5" class="text-center py-8 text-gray-500">
+                                    <i class="fas fa-shopping-cart text-4xl mb-2 block"></i>
+                                    Votre panier est vide
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Résumé et paiement -->
+        <div class="lg:w-1/3">
+            <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Résumé de la commande</h2>
+                
+                <div class="space-y-2 border-b pb-3">
+                    <div class="flex justify-between">
+                        <span>Sous-total</span>
+                        <span id="subtotal">0 FCFA</span>
+                    </div>
+                    <div class="flex justify-between text-green-600">
+                        <span>Livraison</span>
+                        <span>Gratuite</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between text-xl font-bold mt-3">
+                    <span>Total</span>
+                    <span id="grandTotal" class="text-green-700">0 FCFA</span>
+                </div>
+                
+                <button onclick="proceedToCheckout()" id="checkoutBtn" 
+                        class="w-full bg-green-700 text-white py-3 rounded-lg font-semibold mt-4 hover:bg-green-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-credit-card"></i> Procéder au paiement
+                </button>
+                
+                <a href="../index.html" class="block text-center text-green-600 mt-3 hover:underline">
+                    <i class="fas fa-arrow-left"></i> Continuer mes achats
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Modal de paiement -->
+<div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Paiement & Livraison</h2>
+            <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form id="paymentForm">
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Méthode de paiement</label>
+                <select id="paymentMethod" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <option value="">Choisir</option>
+                    <option value="orange">Orange Money</option>
+                    <option value="mtn">MTN Mobile Money</option>
+                </select>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Numéro de téléphone</label>
+                <input type="tel" id="phone" placeholder="6XXXXXXXX" required 
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Lieu de livraison</label>
+                <input type="text" id="deliveryAddress" placeholder="Ville / Quartier" required 
+                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+            </div>
+            
+            <button type="submit" class="w-full bg-green-700 text-white py-3 rounded-lg font-semibold hover:bg-green-800 transition">
+                <i class="fas fa-check-circle"></i> Confirmer et payer
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/cart.js"></script>
+<script>
+let currentCartItems = [];
+
+// Vérifier l'authentification
+if (!isLoggedIn()) {
+    window.location.href = 'login.html';
+}
+
+// Charger et afficher le panier
+async function loadAndDisplayCart() {
+    try {
+        const cart = await getCart();
+        currentCartItems = cart.items || [];
+        displayCartItems();
+        updateSummary();
+    } catch (error) {
+        console.error('Erreur:', error);
+        showToast(error.message, true);
+    }
+}
+
+// Afficher les articles du panier
+function displayCartItems() {
+    const tbody = document.getElementById('cartItems');
+    
+    if (!currentCartItems || currentCartItems.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-8 text-gray-500">
+                    <i class="fas fa-shopping-cart text-4xl mb-2 block"></i>
+                    Votre panier est vide
+                </td>
+            </tr>
+        `;
+        document.getElementById('checkoutBtn').disabled = true;
+        return;
+    }
+    
+    document.getElementById('checkoutBtn').disabled = false;
+    
+    tbody.innerHTML = currentCartItems.map(item => `
+        <tr class="border-b">
+            <td class="p-3" data-label="Produit">
+                <div class="flex items-center gap-3">
+                    <img src="${item.image || 'https://placehold.co/400x400/4CAF50/white?text=Produit'}" alt="${item.name}" class="w-12 h-12 object-cover rounded">
+                    <div>
+                        <p class="font-semibold">${item.name}</p>
+                        ${item.size ? `<p class="text-xs text-gray-500">Taille: ${item.size}</p>` : ''}
+                        ${item.color ? `<p class="text-xs text-gray-500">Couleur: ${item.color}</p>` : ''}
+                    </div>
+                </div>
+            </td>
+            <td class="p-3 text-center" data-label="Prix">${item.price.toLocaleString()} FCFA</td>
+            <td class="p-3 text-center" data-label="Quantité">
+                <div class="flex items-center justify-center gap-2">
+                    <button onclick="updateQty('${item._id}', ${item.quantity - 1})" 
+                            class="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300 ${item.quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${item.quantity <= 1 ? 'disabled' : ''}>
+                        <i class="fas fa-minus text-xs"></i>
+                    </button>
+                    <span class="w-8 text-center">${item.quantity}</span>
+                    <button onclick="updateQty('${item._id}', ${item.quantity + 1})" 
+                            class="w-8 h-8 bg-gray-200 rounded-full hover:bg-gray-300">
+                        <i class="fas fa-plus text-xs"></i>
+                    </button>
+                </div>
+            </td>
+            <td class="p-3 text-center font-semibold" data-label="Total">${(item.price * item.quantity).toLocaleString()} FCFA</td>
+            <td class="p-3 text-center" data-label="Action">
+                <button onclick="removeItem('${item._id}')" class="text-red-500 hover:text-red-700">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// Mettre à jour la quantité
+window.updateQty = async function(itemId, newQty) {
+    if (newQty < 1) return;
+    
+    const item = currentCartItems.find(i => i._id === itemId);
+    if (!item) return;
+    
+    if (newQty > 99) {
+        showToast('Quantité maximale: 99', true);
+        return;
+    }
+    
+    try {
+        await updateCartItem(itemId, newQty);
+        await loadAndDisplayCart();
+        await loadCart(); // Met à jour le compteur global
+    } catch (error) {
+        showToast(error.message, true);
+    }
+};
+
+// Supprimer un article
+window.removeItem = async function(itemId) {
+    try {
+        await removeCartItem(itemId);
+        await loadAndDisplayCart();
+        await loadCart();
+        showToast('Article supprimé du panier');
+    } catch (error) {
+        showToast(error.message, true);
+    }
+};
+
+// Mettre à jour le résumé
+function updateSummary() {
+    const subtotal = currentCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    document.getElementById('subtotal').textContent = `${subtotal.toLocaleString()} FCFA`;
+    document.getElementById('grandTotal').textContent = `${subtotal.toLocaleString()} FCFA`;
+}
+
+// Procéder au paiement
+window.proceedToCheckout = function() {
+    if (!currentCartItems.length) {
+        showToast('Votre panier est vide', true);
+        return;
+    }
+    document.getElementById('paymentModal').classList.add('flex');
+    document.getElementById('paymentModal').classList.remove('hidden');
+};
+
+window.closePaymentModal = function() {
+    document.getElementById('paymentModal').classList.add('hidden');
+    document.getElementById('paymentModal').classList.remove('flex');
+};
+
+// Soumettre le paiement
+document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const phone = document.getElementById('phone').value;
+    const deliveryAddress = document.getElementById('deliveryAddress').value;
+    
+    if (!paymentMethod || !phone || !deliveryAddress) {
+        showToast('Veuillez remplir tous les champs', true);
+        return;
+    }
+    
+    // Validation du numéro de téléphone
+    const phoneRegex = /^[6][0-9]{8}$/;
+    if (!phoneRegex.test(phone)) {
+        showToast('Numéro invalide (ex: 612345678)', true);
+        return;
+    }
+    
+    const totalAmount = currentCartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    const orderData = {
+        items: currentCartItems.map(item => ({
+            productId: item.productId?._id || item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            size: item.size || '',
+            color: item.color || '',
+            image: item.image
+        })),
+        totalAmount,
+        paymentMethod,
+        phone,
+        deliveryAddress
+    };
+    
+    try {
+        const order = await createOrder(orderData);
+        
+        // Générer PDF
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(18);
+        doc.text("Reçu de Paiement - ModeStyle", 105, 20, null, null, "center");
+        
+        doc.setFontSize(12);
+        doc.text(`N° commande: ${order.orderNumber}`, 20, 40);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 50);
+        doc.text(`Méthode: ${paymentMethod === 'orange' ? 'Orange Money' : 'MTN Mobile Money'}`, 20, 60);
+        doc.text(`Téléphone: ${phone}`, 20, 70);
+        doc.text(`Livraison: ${deliveryAddress}`, 20, 80);
+        doc.text(`Total payé: ${totalAmount.toLocaleString()} FCFA`, 20, 90);
+        
+        doc.text("Produits:", 20, 105);
+        let y = 115;
+        currentCartItems.forEach(item => {
+            doc.text(`${item.name} - ${item.price.toLocaleString()} x ${item.quantity} = ${(item.price * item.quantity).toLocaleString()} FCFA`, 25, y);
+            y += 10;
+            if (y > 270) {
+                doc.addPage();
+                y = 20;
+            }
+        });
+        
+        doc.save(`recu_commande_${order.orderNumber}.pdf`);
+        
+        showToast('✅ Paiement effectué avec succès !');
+        closePaymentModal();
+        
+        // Rediriger vers la page des commandes après 2 secondes
+        setTimeout(() => {
+            window.location.href = 'commandes.html';
+        }, 2000);
+        
+    } catch (error) {
+        showToast(error.message, true);
+    }
+});
+
+// Mettre à jour le compteur de favoris
+async function updateFavCount() {
+    try {
+        const favorites = await getFavorites();
+        const count = favorites.length;
+        const favCount = document.getElementById('favCount');
+        if (favCount) {
+            favCount.textContent = count;
+            favCount.classList.toggle('hidden', count === 0);
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    if (isLoggedIn()) {
+        loadAndDisplayCart();
+        updateFavCount();
+        loadCart();
+    }
+});
+</script>
+</body>
+</html>

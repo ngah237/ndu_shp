@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes favoris - ModeStyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-100">
+
+<header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="hover:text-green-200">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+                <a href="cart.html" class="hover:text-green-200 relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+        <i class="fas fa-heart text-red-500"></i> Mes favoris
+    </h1>
+    
+    <div id="favoritesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div class="col-span-full text-center py-12 text-gray-500">
+            <i class="fas fa-heart text-5xl mb-3 block text-gray-300"></i>
+            <p>Aucun produit dans vos favoris</p>
+            <a href="../index.html" class="text-green-600 hover:underline mt-2 inline-block">Découvrir nos produits</a>
+        </div>
+    </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/cart.js"></script>
+<script>
+// Vérifier l'authentification
+if (!isLoggedIn()) {
+    window.location.href = 'login.html';
+}
+
+async function loadFavorites() {
+    try {
+        const favorites = await getFavorites();
+        displayFavorites(favorites);
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('favoritesContainer').innerHTML = `
+            <div class="col-span-full text-center py-12 text-red-500">
+                <i class="fas fa-exclamation-triangle text-5xl mb-3 block"></i>
+                <p>Erreur lors du chargement des favoris</p>
+            </div>
+        `;
+    }
+}
+
+function displayFavorites(favorites) {
+    const container = document.getElementById('favoritesContainer');
+    
+    if (!favorites || favorites.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <i class="fas fa-heart text-5xl mb-3 block text-gray-300"></i>
+                <p>Aucun produit dans vos favoris</p>
+                <a href="../index.html" class="text-green-600 hover:underline mt-2 inline-block">Découvrir nos produits</a>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = favorites.map(fav => {
+        const product = fav.productId;
+        if (!product) return '';
+        
+        return `
+            <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+                <a href="product-details.html?id=${product._id}">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+                </a>
+                <div class="p-3">
+                    <h3 class="font-semibold text-gray-800 truncate">${product.name}</h3>
+                    <div class="flex items-center gap-2 mt-1">
+                        ${product.oldPrice ? `<span class="text-gray-400 line-through text-xs">${product.oldPrice.toLocaleString()} FCFA</span>` : ''}
+                        <p class="text-green-600 font-bold">${product.price.toLocaleString()} FCFA</p>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="addToCartUI('${product._id}', '${product.name}', ${product.price}, 1, '', '', '${product.image}')" 
+                                class="flex-1 bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition text-sm">
+                            <i class="fas fa-shopping-cart"></i> Acheter
+                        </button>
+                        <button onclick="removeFavorite('${product._id}', this)" 
+                                class="text-red-500 hover:text-red-700 p-1.5 border rounded-lg">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function removeFavorite(productId, btnElement) {
+    try {
+        await toggleFavorite(productId);
+        showToast('Retiré des favoris');
+        await loadFavorites();
+        updateFavCount();
+    } catch (error) {
+        showToast(error.message, true);
+    }
+}
+
+async function updateFavCount() {
+    try {
+        const favorites = await getFavorites();
+        const count = favorites.length;
+        const favCount = document.getElementById('favCount');
+        if (favCount) {
+            favCount.textContent = count;
+            favCount.classList.toggle('hidden', count === 0);
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+    }
+}
+
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed bottom-4 right-4 z-50 ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm toast-slide`;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    if (isLoggedIn()) {
+        loadFavorites();
+        loadCart();
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessoires - ModeStyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-100">
+
+<header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="hover:text-green-200">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+                <a href="cart.html" class="hover:text-green-200 relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Accessoires</h1>
+    
+    <div id="productsContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div class="col-span-full text-center py-12 text-gray-500">
+            <i class="fas fa-spinner fa-spin text-3xl mb-3 block"></i>
+            <p>Chargement des produits...</p>
+        </div>
+    </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/cart.js"></script>
+<script>
+// Pour accessoires.html - catégorie 'accessoires'
+const CATEGORY = 'accessoires';
+
+async function loadProducts() {
+    try {
+        const products = await getProductsByCategory(CATEGORY);
+        displayProducts(products);
+    } catch (error) {
+        document.getElementById('productsContainer').innerHTML = `
+            <div class="col-span-full text-center py-12 text-red-500">
+                <i class="fas fa-exclamation-triangle text-5xl mb-3 block"></i>
+                <p>Erreur lors du chargement</p>
+                <button onclick="loadProducts()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg">Réessayer</button>
+            </div>
+        `;
+    }
+}
+
+function displayProducts(products) {
+    const container = document.getElementById('productsContainer');
+    
+    if (!products || products.length === 0) {
+        container.innerHTML = `
+            <div class="col-span-full text-center py-12 text-gray-500">
+                <i class="fas fa-search text-5xl mb-3 block text-gray-300"></i>
+                <p>Aucun produit trouvé dans cette catégorie</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = products.map(product => `
+        <div class="bg-white rounded-lg shadow-md overflow-hidden group">
+            <a href="product-details.html?id=${product._id}">
+                <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
+            </a>
+            <div class="p-3">
+                <h3 class="font-semibold text-gray-800 truncate">${product.name}</h3>
+                <div class="flex items-center gap-2 mt-1">
+                    ${product.oldPrice ? `<span class="text-gray-400 line-through text-xs">${product.oldPrice.toLocaleString()} FCFA</span>` : ''}
+                    <p class="text-green-600 font-bold">${product.price.toLocaleString()} FCFA</p>
+                </div>
+                ${product.isPromo ? '<span class="inline-block bg-red-500 text-white text-xs px-2 py-0.5 rounded-full mt-1">Promo</span>' : ''}
+                <div class="flex gap-2 mt-3">
+                    <button onclick="addToCartUI('${product._id}', '${product.name}', ${product.price}, 1, '', '', '${product.image}')" 
+                            class="flex-1 bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition text-sm">
+                        <i class="fas fa-shopping-cart"></i> Acheter
+                    </button>
+                    <button onclick="toggleFavoriteUI('${product._id}', this)" 
+                            class="favorite-btn text-gray-400 hover:text-red-500 p-1.5 border rounded-lg">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function toggleFavoriteUI(productId, btnElement) {
+    if (!isLoggedIn()) {
+        showToast('Veuillez vous connecter', true);
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 1500);
+        return;
+    }
+    
+    try {
+        const result = await toggleFavorite(productId);
+        const icon = btnElement.querySelector('i');
+        if (result.isFavorite) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            btnElement.classList.add('text-red-500');
+            showToast('Ajouté aux favoris');
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            btnElement.classList.remove('text-red-500');
+            showToast('Retiré des favoris');
+        }
+    } catch (error) {
+        showToast(error.message, true);
+    }
+}
+
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed bottom-4 right-4 z-50 ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm toast-slide`;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts();
+    if (isLoggedIn()) {
+        loadCart();
+    }
+});
+</script>
+</body>
+</html>
+const CATEGORY = 'new';
+async function loadProducts() {
+    const products = await getNewProducts();
+    displayProducts(products);
+}

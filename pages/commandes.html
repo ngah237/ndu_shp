@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes commandes - ModeStyle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-100">
+
+<header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
+    <div class="container mx-auto px-4 py-3">
+        <div class="flex justify-between items-center">
+            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
+            <div class="flex items-center gap-4">
+                <a href="../index.html" class="hover:text-green-200">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+                <a href="cart.html" class="hover:text-green-200 relative">
+                    <i class="fas fa-shopping-cart text-xl"></i>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </    </div>
+</header>
+
+<main class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+        <i class="fas fa-box text-green-600"></i> Mes commandes
+    </h1>
+    
+    <div id="ordersContainer" class="space-y-4">
+        <div class="text-center py-12 text-gray-500">
+            <i class="fas fa-spinner fa-spin text-3xl mb-3 block"></i>
+            <p>Chargement de vos commandes...</p>
+        </div>
+    </div>
+</main>
+
+<!-- Modal Détails commande -->
+<div id="orderModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+            <h2 class="text-xl font-bold">Détails de la commande</h2>
+            <button onclick="closeOrderModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <div id="orderDetails" class="p-6">
+            <!-- Contenu dynamique -->
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script src="../js/api.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/cart.js"></script>
+<script>
+// Vérifier l'authentification
+if (!isLoggedIn()) {
+    window.location.href = 'login.html';
+}
+
+let allOrders = [];
+
+async function loadOrders() {
+    try {
+        const orders = await getUserOrders();
+        allOrders = orders;
+        displayOrders(orders);
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('ordersContainer').innerHTML = `
+            <div class="text-center py-12 text-red-500">
+                <i class="fas fa-exclamation-triangle text-5xl mb-3 block"></i>
+                <p>Erreur lors du chargement des commandes</p>
+                <button onclick="loadOrders()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg">Réessayer</button>
+            </div>
+        `;
+    }
+}
+
+function displayOrders(orders) {
+    const container = document.getElementById('ordersContainer');
+    
+    if (!orders || orders.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-500 bg-white rounded-xl">
+                <i class="fas fa-shopping-bag text-5xl mb-3 block text-gray-300"></i>
+                <p>Aucune commande passée</p>
+                <a href="../index.html" class="text-green-600 hover:underline mt-2 inline-block">Découvrir nos produits</a>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = orders.map(order => {
+        const statusColors = {
+            pending: 'bg-yellow-100 text-yellow-800',
+            paid: 'bg-blue-100 text-blue-800',
+            shipped: 'bg-purple-100 text-purple-800',
+            delivered: 'bg-green-100 text-green-800',
+            cancelled: 'bg-red-100 text-red-800'
+        };
+        
+        const statusText = {
+            pending: 'En attente',
+            paid: 'Payée',
+            shipped: 'Expédiée',
+            delivered: 'Livrée',
+            cancelled: 'Annulée'
+        };
+        
+        return `
+            <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                <div class="p-4 border-b bg-gray-50 flex flex-wrap justify-between items-center gap-3">
+                    <div>
+                        <p class="text-sm text-gray-500">N° commande</p>
+                        <p class="font-semibold">${order.orderNumber}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Date</p>
+                        <p class="font-semibold">${new Date(order.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Total</p>
+                        <p class="font-semibold text-green-600">${order.totalAmount.toLocaleString()} FCFA</p>
+                    </div>
+                    <div>
+                        <span class="${statusColors[order.status]} px-3 py-1 rounded-full text-sm font-semibold">
+                            ${statusText[order.status]}
+                        </span>
+                    </div>
+                    <button onclick="showOrderDetails('${order._id}')" 
+                            class="text-green-600 hover:text-green-800 font-semibold text-sm">
+                        <i class="fas fa-eye"></i> Détails
+                    </button>
+                </div>
+                <div class="p-4">
+                    <p class="text-sm text-gray-600 mb-2">Produits (${order.items.length})</p>
+                    <div class="flex gap-3 overflow-x-auto pb-2">
+                        ${order.items.slice(0, 3).map(item => `
+                            <div class="flex items-center gap-2 bg-gray-50 rounded-lg p-2 min-w-[150px]">
+                                <img src="${item.image || 'https://placehold.co/400x400/4CAF50/white?text=Produit'}" alt="${item.name}" class="w-10 h-10 object-cover rounded">
+                                <div>
+                                    <p class="text-sm font-semibold truncate max-w-[100px]">${item.name}</p>
+                                    <p class="text-xs text-gray-500">x${item.quantity}</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${order.items.length > 3 ? `<div class="flex items-center text-gray-500 text-sm">+${order.items.length - 3} autres</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function showOrderDetails(orderId) {
+    try {
+        const order = await getOrderById(orderId);
+        
+        const statusColors = {
+            pending: 'bg-yellow-100 text-yellow-800',
+            paid: 'bg-blue-100 text-blue-800',
+            shipped: 'bg-purple-100 text-purple-800',
+            delivered: 'bg-green-100 text-green-800',
+            cancelled: 'bg-red-100 text-red-800'
+        };
+        
+        const statusText = {
+            pending: 'En attente',
+            paid: 'Payée',
+            shipped: 'Expédiée',
+            delivered: 'Livrée',
+            cancelled: 'Annulée'
+        };
+        
+        document.getElementById('orderDetails').innerHTML = `
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <p class="text-gray-500">N° commande</p>
+                        <p class="font-semibold">${order.orderNumber}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Date</p>
+                        <p class="font-semibold">${new Date(order.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Statut</p>
+                        <span class="${statusColors[order.status]} px-2 py-1 rounded-full text-xs font-semibold inline-block">
+                            ${statusText[order.status]}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-gray-500">Paiement</p>
+                        <p class="font-semibold">${order.paymentMethod === 'orange' ? 'Orange Money' : 'MTN Mobile Money'}</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-gray-500">Téléphone</p>
+                        <p class="font-semibold">${order.phone}</p>
+                    </div>
+                    <div class="col-span-2">
+                        <p class="text-gray-500">Livraison</p>
+                        <p class="font-semibold">${order.deliveryAddress}</p>
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <h3 class="font-semibold mb-3">Produits commandés</h3>
+                    <div class="space-y-2">
+                        ${order.items.map(item => `
+                            <div class="flex gap-3 items-center border-b pb-2">
+                                <img src="${item.image || 'https://placehold.co/400x400/4CAF50/white?text=Produit'}" class="w-12 h-12 object-cover rounded">
+                                <div class="flex-1">
+                                    <p class="font-semibold">${item.name}</p>
+                                    ${item.size ? `<p class="text-xs text-gray-500">Taille: ${item.size}</p>` : ''}
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm">${item.quantity} x ${item.price.toLocaleString()} FCFA</p>
+                                    <p class="font-semibold text-green-600">${(item.price * item.quantity).toLocaleString()} FCFA</p>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                
+                <div class="border-t pt-4">
+                    <div class="flex justify-between text-lg font-bold">
+                        <span>Total</span>
+                        <span class="text-green-700">${order.totalAmount.toLocaleString()} FCFA</span>
+                    </div>
+                </div>
+                
+                <button onclick="window.print()" class="w-full bg-gray-200 text-gray-800 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">
+                    <i class="fas fa-print"></i> Imprimer le reçu
+                </button>
+            </div>
+        `;
+        
+        document.getElementById('orderModal').classList.add('flex');
+        document.getElementById('orderModal').classList.remove('hidden');
+    } catch (error) {
+        showToast(error.message, true);
+    }
+}
+
+function closeOrderModal() {
+    document.getElementById('orderModal').classList.add('hidden');
+    document.getElementById('orderModal').classList.remove('flex');
+}
+
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `fixed bottom-4 right-4 z-50 ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm toast-slide`;
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 3000);
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    if (isLoggedIn()) {
+        loadOrders();
+        loadCart();
+    }
+});
+</script>
+</body>
+</html>
