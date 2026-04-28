@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; padding: 20px;">
+    <h1 style="color: #4CAF50;">✅ Confirmation de commande</h1>
+    <p>Bonjour {{name}},</p>
+    <p>Votre commande <strong>#{{orderNumber}}</strong> a été confirmée.</p>
+    <h3>Récapitulatif :</h3>
+    <ul>
+        {{#each items}}
+        <li>{{this.name}} x {{this.quantity}} = {{this.price}} FCFA</li>
+        {{/each}}
+    </ul>
+    <p><strong>Total : {{total}} FCFA</strong></p>
+    <p>Vous serez notifié dès l'expédition.</p>
+    <p>Merci de votre confiance !</p>
+    <hr>
+    <p style="font-size: 12px; color: gray;">ModeStyle - Ngaoundéré, Cameroun</p>
+</body>
+</html>
