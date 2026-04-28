@@ -8,124 +8,49 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Styles mobiles améliorés */
         @media (max-width: 768px) {
-            .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-            .product-card button {
-                min-height: 40px;
-                font-size: 12px;
-            }
-            .product-card h3 {
-                font-size: 13px;
-            }
-            .product-card .price {
-                font-size: 14px;
-            }
-            .toast {
-                bottom: 16px;
-                right: 16px;
-                left: 16px;
-                text-align: center;
-                font-size: 12px;
-            }
-            .slider-btn {
-                width: 32px;
-                height: 32px;
-            }
-            .slider-btn i {
-                font-size: 14px;
-            }
-            .welcome-message h2 {
-                font-size: 1.1rem;
-            }
-            .welcome-message p {
-                font-size: 0.85rem;
-            }
-            .section-title {
-                font-size: 1.2rem;
-            }
-            .stats-card {
-                padding: 12px;
-            }
-            .stats-card p:first-child {
-                font-size: 11px;
-            }
-            .stats-card .text-2xl {
-                font-size: 1.25rem;
-            }
+            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .product-card button { min-height: 40px; font-size: 12px; }
+            .product-card h3 { font-size: 13px; }
+            .toast { bottom: 16px; right: 16px; left: 16px; text-align: center; font-size: 12px; }
+            .slider-btn { width: 32px; height: 32px; }
+            .slider-btn i { font-size: 14px; }
         }
-
         @media (max-width: 480px) {
-            .products-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
-            }
-            .product-card img {
-                height: 200px;
-            }
+            .products-grid { grid-template-columns: 1fr; gap: 16px; }
+            .product-card img { height: 200px; }
         }
-
-        /* Animation pour le menu mobile */
-        .mobile-menu-enter {
-            max-height: 0;
+        button, .product-card button { min-height: 44px; display: inline-flex; align-items: center; }
+        .product-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .product-card:active { transform: scale(0.98); }
+        .slider-img { transition: opacity 0.5s ease-in-out; }
+        
+        /* Animation menu mobile */
+        .mobile-menu {
+            transition: max-height 0.3s ease-out, opacity 0.2s ease;
             overflow: hidden;
-            transition: max-height 0.3s ease-out;
         }
-        .mobile-menu-enter-active {
-            max-height: 500px;
-        }
-        .mobile-menu-exit {
-            max-height: 500px;
-            overflow: hidden;
-            transition: max-height 0.2s ease-in;
-        }
-        .mobile-menu-exit-active {
-            max-height: 0;
-        }
-        
-        /* Toucher friendly */
-        button, 
-        .product-card button,
-        .sidebar-item,
-        .footer-section a,
-        nav a {
-            min-height: 44px;
-            display: inline-flex;
-            align-items: center;
-        }
-        
-        /* Product card améliorée */
-        .product-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .product-card:active {
-            transform: scale(0.98);
-        }
-        
-        /* Slider amélioré */
-        .slider-img {
-            transition: opacity 0.5s ease-in-out;
+        .mobile-menu.hidden {
+            max-height: 0 !important;
+            opacity: 0;
+            padding: 0;
+            margin: 0;
         }
     </style>
 </head>
 <body class="bg-gray-50">
 
-<!-- Header avec navigation responsive - Version originale restaurée -->
+<!-- Header -->
 <header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
     <div class="container mx-auto px-4 py-3">
         <div class="flex justify-between items-center flex-wrap gap-3">
-            <!-- Logo + menu mobile -->
             <div class="flex items-center gap-3">
-                <button id="mobileMenuBtn" class="lg:hidden text-2xl hover:text-green-200">
+                <button id="mobileMenuBtn" class="lg:hidden text-2xl hover:text-green-200 focus:outline-none">
                     <i class="fas fa-bars"></i>
                 </button>
                 <a href="index.html" class="text-xl md:text-2xl font-bold">ModeStyle</a>
             </div>
 
-            <!-- Navigation desktop -->
             <nav class="hidden lg:flex space-x-5 text-sm">
                 <a href="index.html" class="hover:text-green-200">Accueil</a>
                 <a href="pages/vetements.html" class="hover:text-green-200">Vêtements</a>
@@ -134,9 +59,11 @@
                 <a href="pages/lingerie.html" class="hover:text-green-200">Lingerie</a>
                 <a href="pages/promos.html" class="hover:text-green-200 text-yellow-300">Promos</a>
                 <a href="pages/nouveautes.html" class="hover:text-green-200">Nouveautés</a>
+                <a href="pages/admin/login.html" class="hover:text-green-200">
+                    <i class="fas fa-shield-alt"></i> Admin
+                </a>
             </nav>
 
-            <!-- Actions utilisateur -->
             <div class="flex items-center gap-4">
                 <div class="relative hidden md:block">
                     <input type="text" id="searchInput" placeholder="Rechercher..." 
@@ -169,26 +96,29 @@
             </div>
         </div>
 
-        <!-- Mobile search -->
         <div class="md:hidden mt-3">
             <input type="text" id="mobileSearch" placeholder="Rechercher un produit..." 
                    class="w-full px-4 py-2 rounded-full text-gray-800 text-sm focus:outline-none">
         </div>
     </div>
 
-    <!-- Menu mobile -->
-    <div id="mobileMenu" class="hidden lg:hidden bg-green-800 py-2">
-        <div class="container mx-auto px-4 flex flex-col space-y-1">
-            <a href="index.html" class="py-2 hover:bg-green-600 px-3 rounded">Accueil</a>
-            <a href="pages/vetements.html" class="py-2 hover:bg-green-600 px-3 rounded">Vêtements</a>
-            <a href="pages/chaussures.html" class="py-2 hover:bg-green-600 px-3 rounded">Chaussures</a>
-            <a href="pages/accessoires.html" class="py-2 hover:bg-green-600 px-3 rounded">Accessoires</a>
-            <a href="pages/lingerie.html" class="py-2 hover:bg-green-600 px-3 rounded">Lingerie</a>
-            <a href="pages/promos.html" class="py-2 hover:bg-green-600 px-3 rounded text-yellow-300">Promos</a>
-            <a href="pages/nouveautes.html" class="py-2 hover:bg-green-600 px-3 rounded">Nouveautés</a>
-            <a href="pages/livraison.html" class="py-2 hover:bg-green-600 px-3 rounded">Livraison</a>
-            <a href="pages/contact.html" class="py-2 hover:bg-green-600 px-3 rounded">Contact</a>
-            <a href="pages/about.html" class="py-2 hover:bg-green-600 px-3 rounded">À propos</a>
+    <!-- Menu mobile - CORRIGÉ -->
+    <div id="mobileMenu" class="mobile-menu hidden lg:hidden bg-green-800">
+        <div class="container mx-auto px-4 py-2 flex flex-col">
+            <a href="index.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Accueil</a>
+            <a href="pages/vetements.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Vêtements</a>
+            <a href="pages/chaussures.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Chaussures</a>
+            <a href="pages/accessoires.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Accessoires</a>
+            <a href="pages/lingerie.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Lingerie</a>
+            <a href="pages/promos.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition text-yellow-300">Promos</a>
+            <a href="pages/nouveautes.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Nouveautés</a>
+            <div class="border-t border-green-600 my-2"></div>
+            <a href="pages/livraison.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Livraison</a>
+            <a href="pages/contact.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">Contact</a>
+            <a href="pages/about.html" class="py-3 hover:bg-green-600 px-3 rounded-lg transition">À propos</a>
+            <a href="pages/admin/login.html" class="py-3 hover:bg-yellow-600 px-3 rounded-lg transition text-yellow-300">
+                <i class="fas fa-shield-alt mr-2"></i> Administration
+            </a>
         </div>
     </div>
 </header>
@@ -196,12 +126,9 @@
 <!-- Hero Slider -->
 <div class="relative h-56 sm:h-80 md:h-96 overflow-hidden">
     <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=500&fit=crop" 
-             class="slider-img absolute w-full h-full object-cover transition-opacity duration-700 opacity-100">
-        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=500&fit=crop" 
-             class="slider-img absolute w-full h-full object-cover transition-opacity duration-700 opacity-0">
-        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&h=500&fit=crop" 
-             class="slider-img absolute w-full h-full object-cover transition-opacity duration-700 opacity-0">
+        <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=500&fit=crop" class="slider-img absolute w-full h-full object-cover opacity-100">
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1920&h=500&fit=crop" class="slider-img absolute w-full h-full object-cover opacity-0">
+        <img src="https://images.unsplash.com/photo-1445205170230-053b83016050?w=1920&h=500&fit=crop" class="slider-img absolute w-full h-full object-cover opacity-0">
     </div>
     <button id="prevSlide" class="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70">
         <i class="fas fa-chevron-left"></i>
@@ -212,15 +139,12 @@
 </div>
 
 <main class="container mx-auto px-4 py-6 md:py-8">
-
-    <!-- Bienvenue -->
     <div class="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-4 md:p-6 mb-8 text-center">
         <h2 class="text-xl md:text-2xl font-bold text-green-800">Bienvenue sur ModeStyle !</h2>
         <p class="text-gray-700 mt-1">Découvrez notre collection exclusive de vêtements et accessoires</p>
         <p id="welcomeMsg" class="text-green-700 font-semibold mt-2"></p>
     </div>
 
-    <!-- Section Homme -->
     <section class="mb-10">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -228,12 +152,9 @@
             </h2>
             <a href="pages/vetements.html?cat=homme" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsHomme" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-            <!-- Chargement via JS -->
-        </div>
+        <div id="productsHomme" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
     </section>
 
-    <!-- Section Femme -->
     <section class="mb-10">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -241,11 +162,9 @@
             </h2>
             <a href="pages/vetements.html?cat=femme" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsFemme" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-        </div>
+        <div id="productsFemme" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
     </section>
 
-    <!-- Section Promotions -->
     <section class="mb-10">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -253,11 +172,9 @@
             </h2>
             <a href="pages/promos.html" class="text-red-600 hover:text-red-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsPromo" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-        </div>
+        <div id="productsPromo" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
     </section>
 
-    <!-- Section Nouveautés -->
     <section class="mb-10">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
@@ -265,79 +182,32 @@
             </h2>
             <a href="pages/nouveautes.html" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsNew" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-        </div>
+        <div id="productsNew" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4"></div>
     </section>
 
-    <!-- Newsletter -->
     <section class="bg-green-700 rounded-xl p-6 md:p-8 text-center text-white mt-8">
         <h3 class="text-xl md:text-2xl font-bold mb-2">Abonnez-vous à notre newsletter</h3>
         <p class="mb-4 text-sm md:text-base">Recevez nos offres exclusives et nouveautés directement dans votre boîte mail</p>
         <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input type="email" id="newsletterEmail" placeholder="Votre email" 
-                   class="px-4 py-2 rounded-full text-gray-800 flex-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
-            <button onclick="subscribeNewsletter()" class="bg-yellow-500 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition">
-                S'abonner
-            </button>
+            <input type="email" id="newsletterEmail" placeholder="Votre email" class="px-4 py-2 rounded-full text-gray-800 flex-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <button onclick="subscribeNewsletter()" class="bg-yellow-500 text-gray-800 px-6 py-2 rounded-full font-semibold hover:bg-yellow-400 transition">S'abonner</button>
         </div>
     </section>
 </main>
 
-<!-- Footer -->
 <footer class="bg-gray-900 text-gray-400 mt-12">
     <div class="container mx-auto px-4 py-8">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-            <div>
-                <h3 class="text-white font-bold text-lg mb-3">ModeStyle</h3>
-                <p class="text-sm">Votre boutique en ligne de vêtements et accessoires de qualité au Cameroun.</p>
-                <div class="flex gap-3 mt-4">
-                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="hover:text-white text-xl"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
-            <div>
-                <h3 class="text-white font-bold mb-3">Liens rapides</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="index.html" class="hover:text-white">Accueil</a></li>
-                    <li><a href="pages/vetements.html" class="hover:text-white">Vêtements</a></li>
-                    <li><a href="pages/chaussures.html" class="hover:text-white">Chaussures</a></li>
-                    <li><a href="pages/accessoires.html" class="hover:text-white">Accessoires</a></li>
-                    <li><a href="pages/promos.html" class="hover:text-white">Promotions</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-white font-bold mb-3">Information</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><a href="pages/livraison.html" class="hover:text-white">Livraison & retour</a></li>
-                    <li><a href="pages/contact.html" class="hover:text-white">Contact</a></li>
-                    <li><a href="pages/about.html" class="hover:text-white">À propos</a></li>
-                    <li><a href="#" class="hover:text-white">Conditions générales</a></li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-white font-bold mb-3">Contact</h3>
-                <ul class="space-y-2 text-sm">
-                    <li><i class="fas fa-phone mr-2"></i> +237 6 95 76 79 26</li>
-                    <li><i class="fas fa-envelope mr-2"></i> contact@modestyle.com</li>
-                    <li><i class="fas fa-map-marker-alt mr-2"></i> Ngaoundéré, Cameroun</li>
-                </ul>
-                <div class="mt-4">
-                    <a href="https://wa.me/237695767926" class="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-1.5 rounded-full text-sm hover:bg-green-700 transition">
-                        <i class="fab fa-whatsapp"></i> WhatsApp
-                    </a>
-                </div>
-            </div>
+            <div><h3 class="text-white font-bold text-lg mb-3">ModeStyle</h3><p class="text-sm">Votre boutique en ligne de vêtements et accessoires de qualité au Cameroun.</p></div>
+            <div><h3 class="text-white font-bold mb-3">Liens rapides</h3><ul class="space-y-2 text-sm"><li><a href="index.html" class="hover:text-white">Accueil</a></li><li><a href="pages/vetements.html" class="hover:text-white">Vêtements</a></li><li><a href="pages/chaussures.html" class="hover:text-white">Chaussures</a></li><li><a href="pages/accessoires.html" class="hover:text-white">Accessoires</a></li></ul></div>
+            <div><h3 class="text-white font-bold mb-3">Information</h3><ul class="space-y-2 text-sm"><li><a href="pages/livraison.html" class="hover:text-white">Livraison & retour</a></li><li><a href="pages/contact.html" class="hover:text-white">Contact</a></li><li><a href="pages/about.html" class="hover:text-white">À propos</a></li></ul></div>
+            <div><h3 class="text-white font-bold mb-3">Contact</h3><ul class="space-y-2 text-sm"><li><i class="fas fa-phone mr-2"></i> +237 6 95 76 79 26</li><li><i class="fas fa-envelope mr-2"></i> contact@modestyle.com</li><li><i class="fas fa-map-marker-alt mr-2"></i> Ngaoundéré, Cameroun</li></ul></div>
         </div>
-        <div class="border-t border-gray-800 mt-6 pt-4 text-center text-gray-500 text-xs">
-            <p>&copy; 2026 ModeStyle - Tous droits réservés</p>
-        </div>
+        <div class="border-t border-gray-800 mt-6 pt-4 text-center text-gray-500 text-xs"><p>&copy; 2026 ModeStyle - Tous droits réservés</p></div>
     </div>
 </footer>
 
-<!-- Toast -->
-<div id="toast" class="toast fixed bottom-4 right-4 left-4 sm:left-auto z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm text-center"></div>
+<div id="toast" class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm text-center"></div>
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
@@ -345,69 +215,80 @@
 <script src="js/main.js"></script>
 
 <script>
-// Menu mobile amélioré avec animation (ajouté pour l'adaptation mobile)
+// ==================== MENU HAMBURGER CORRIGÉ ====================
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileMenu = document.getElementById('mobileMenu');
 
 if (mobileMenuBtn && mobileMenu) {
     mobileMenuBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        if (mobileMenu.classList.contains('hidden')) {
-            mobileMenu.classList.remove('hidden');
-            setTimeout(() => {
-                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
-            }, 10);
-        } else {
-            mobileMenu.style.maxHeight = '0';
-            setTimeout(() => {
-                mobileMenu.classList.add('hidden');
-                mobileMenu.style.maxHeight = '';
-            }, 300);
-        }
+        mobileMenu.classList.toggle('hidden');
     });
 
+    // Fermer le menu quand on clique sur un lien
     mobileMenu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            mobileMenu.style.maxHeight = '0';
-            setTimeout(() => {
-                mobileMenu.classList.add('hidden');
-                mobileMenu.style.maxHeight = '';
-            }, 300);
+            mobileMenu.classList.add('hidden');
         });
     });
 }
 
+// Fermer le menu quand on clique en dehors
 document.addEventListener('click', function(event) {
-    if (mobileMenu && !mobileMenu.classList.contains('hidden') && !mobileMenuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
-        mobileMenu.style.maxHeight = '0';
-        setTimeout(() => {
+    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+        if (!mobileMenuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
             mobileMenu.classList.add('hidden');
-            mobileMenu.style.maxHeight = '';
-        }, 300);
+        }
     }
 });
 
-// Slider amélioré avec gestes tactiles (ajouté pour l'adaptation mobile)
-let touchStartX = 0;
-let touchEndX = 0;
-
-const sliderContainer = document.querySelector('.relative.h-56');
-if (sliderContainer) {
-    sliderContainer.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
+// ==================== SLIDER ====================
+let currentSlide = 0;
+const slides = document.querySelectorAll('.slider-img');
+if (slides.length) {
+    setInterval(() => {
+        slides[currentSlide].style.opacity = '0';
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].style.opacity = '1';
+    }, 4000);
+    
+    document.getElementById('prevSlide')?.addEventListener('click', () => {
+        slides[currentSlide].style.opacity = '0';
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        slides[currentSlide].style.opacity = '1';
     });
     
-    sliderContainer.addEventListener('touchend', (e) => {
-        touchEndX = e.changedTouches[0].screenX;
-        const diff = touchStartX - touchEndX;
-        if (Math.abs(diff) > 50) {
-            if (diff > 0) {
-                document.getElementById('nextSlide')?.click();
-            } else {
-                document.getElementById('prevSlide')?.click();
-            }
-        }
+    document.getElementById('nextSlide')?.addEventListener('click', () => {
+        slides[currentSlide].style.opacity = '0';
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].style.opacity = '1';
     });
+}
+
+// ==================== AUTRES FONCTIONS ====================
+window.subscribeNewsletter = function() {
+    const email = document.getElementById('newsletterEmail').value;
+    if (!email || !email.includes('@')) {
+        const toast = document.getElementById('toast');
+        toast.textContent = 'Email invalide';
+        toast.className = 'fixed bottom-4 right-4 left-4 sm:left-auto z-50 bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm text-center';
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+        return;
+    }
+    const toast = document.getElementById('toast');
+    toast.textContent = '✅ Merci pour votre abonnement !';
+    toast.className = 'fixed bottom-4 right-4 left-4 sm:left-auto z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm text-center';
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+    document.getElementById('newsletterEmail').value = '';
+};
+
+const user = localStorage.getItem('userInfo');
+const welcomeMsg = document.getElementById('welcomeMsg');
+if (welcomeMsg) {
+    if (user) { const u = JSON.parse(user); welcomeMsg.innerHTML = `Bon retour, <strong>${u.name}</strong> ! 🎉`; }
+    else { welcomeMsg.innerHTML = `<a href="pages/login.html" class="text-green-700 underline">Connectez-vous</a> pour profiter de vos avantages exclusifs !`; }
 }
 </script>
 </body>
