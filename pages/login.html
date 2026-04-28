@@ -6,17 +6,14 @@
     <title>Connexion - ModeStyle</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-gray-100">
 
 <header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
     <div class="container mx-auto px-4 py-3">
         <div class="flex justify-between items-center">
-            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
-            <a href="../index.html" class="hover:text-green-200">
-                <i class="fas fa-home"></i> Accueil
-            </a>
+            <a href="../index.html" class="text-2xl font-bold">ModeStyle</a>
+            <a href="../index.html" class="hover:text-green-200">← Retour à la boutique</a>
         </div>
     </div>
 </header>
@@ -24,59 +21,125 @@
 <main class="container mx-auto px-4 py-12">
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="bg-green-700 px-6 py-4">
-            <h1 class="text-white text-2xl font-bold text-center">Connexion</h1>
+            <div class="flex justify-center gap-4">
+                <div class="text-center">
+                    <i class="fas fa-user text-white text-3xl"></i>
+                    <p class="text-white text-sm mt-1">Client</p>
+                </div>
+                <div class="text-center">
+                    <i class="fas fa-shield-alt text-white text-3xl"></i>
+                    <p class="text-white text-sm mt-1">Admin</p>
+                </div>
+            </div>
+            <h1 class="text-white text-2xl font-bold text-center mt-2">Connexion unique</h1>
         </div>
         
         <div class="p-6">
             <form id="loginForm">
                 <div class="mb-4">
                     <label class="block text-gray-700 font-semibold mb-2">Email</label>
-                    <input type="email" id="email" required 
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                        <input type="email" id="email" placeholder="votre@email.com" 
+                               class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
                 </div>
                 
-                <div class="mb-4">
+                <div class="mb-6">
                     <label class="block text-gray-700 font-semibold mb-2">Mot de passe</label>
-                    <input type="password" id="password" required 
-                           class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                        <input type="password" id="password" placeholder="••••••••" 
+                               class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
                 </div>
                 
                 <button type="submit" class="w-full bg-green-700 text-white py-2 rounded-lg font-semibold hover:bg-green-800 transition">
-                    Se connecter
+                    <i class="fas fa-sign-in-alt mr-2"></i> Se connecter
                 </button>
             </form>
             
             <div id="errorMsg" class="mt-4 text-red-600 text-center text-sm hidden"></div>
             
-            <p class="mt-6 text-center text-gray-600">
-                Pas encore de compte ? 
-                <a href="register.html" class="text-green-700 font-semibold hover:underline">S'inscrire</a>
-            </p>
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">Pas encore de compte ? 
+                    <a href="register.html" class="text-green-700 font-semibold hover:underline">S'inscrire</a>
+                </p>
+                <p class="text-gray-500 text-xs mt-3">
+                    <a href="../index.html" class="hover:underline">← Retour à la boutique</a>
+                </p>
+            </div>
         </div>
     </div>
 </main>
 
-<script src="../js/api.js"></script>
-<script src="../js/auth.js"></script>
 <script>
-    redirectIfLoggedIn();
+const API_URL = 'http://localhost:5000/api';
+
+// Cette fonction a été modifiée pour NE PAS rediriger automatiquement
+// Elle permet de rester sur la page de connexion
+function checkAlreadyLoggedIn() {
+    // Ne plus rediriger automatiquement depuis la page login
+    // L'utilisateur doit pouvoir accéder à la page de connexion
+    console.log('Page de connexion - prêt à se connecter');
+    return false;
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
     
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const submitBtn = document.querySelector('button[type="submit"]');
+    
+    if (!email || !password) {
+        errorMsg.textContent = 'Veuillez remplir tous les champs';
+        errorMsg.classList.remove('hidden');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connexion...';
+    
+    try {
+        const res = await fetch(`${API_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
         
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('errorMsg');
+        const data = await res.json();
         
-        try {
-            const user = await login({ email, password });
-            setCurrentUser(user);
-            window.location.href = '../index.html';
-        } catch (error) {
-            errorMsg.textContent = error.message;
+        if (res.ok) {
+            // Stocker les informations
+            localStorage.setItem('userToken', data.token);
+            localStorage.setItem('userInfo', JSON.stringify(data));
+            
+            // Rediriger selon le rôle
+            if (data.role === 'admin') {
+                localStorage.setItem('adminToken', data.token);
+                localStorage.setItem('adminInfo', JSON.stringify(data));
+                window.location.href = 'admin/dashboard.html';
+            } else {
+                window.location.href = '../index.html';
+            }
+        } else {
+            errorMsg.textContent = data.message || 'Email ou mot de passe incorrect';
             errorMsg.classList.remove('hidden');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Se connecter';
         }
-    });
+    } catch (error) {
+        errorMsg.textContent = 'Erreur de connexion au serveur. Vérifiez que le backend est démarré.';
+        errorMsg.classList.remove('hidden');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i> Se connecter';
+    }
+});
+
+// Ne pas rediriger automatiquement
+// checkAlreadyLoggedIn();
 </script>
 </body>
 </html>

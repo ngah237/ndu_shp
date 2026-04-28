@@ -2,18 +2,120 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
     <title>ModeStyle - Vêtements & Accessoires</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Styles mobiles améliorés */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            .product-card button {
+                min-height: 40px;
+                font-size: 12px;
+            }
+            .product-card h3 {
+                font-size: 13px;
+            }
+            .product-card .price {
+                font-size: 14px;
+            }
+            .toast {
+                bottom: 16px;
+                right: 16px;
+                left: 16px;
+                text-align: center;
+                font-size: 12px;
+            }
+            .slider-btn {
+                width: 32px;
+                height: 32px;
+            }
+            .slider-btn i {
+                font-size: 14px;
+            }
+            .welcome-message h2 {
+                font-size: 1.1rem;
+            }
+            .welcome-message p {
+                font-size: 0.85rem;
+            }
+            .section-title {
+                font-size: 1.2rem;
+            }
+            .stats-card {
+                padding: 12px;
+            }
+            .stats-card p:first-child {
+                font-size: 11px;
+            }
+            .stats-card .text-2xl {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .product-card img {
+                height: 200px;
+            }
+        }
+
+        /* Animation pour le menu mobile */
+        .mobile-menu-enter {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .mobile-menu-enter-active {
+            max-height: 500px;
+        }
+        .mobile-menu-exit {
+            max-height: 500px;
+            overflow: hidden;
+            transition: max-height 0.2s ease-in;
+        }
+        .mobile-menu-exit-active {
+            max-height: 0;
+        }
+        
+        /* Toucher friendly */
+        button, 
+        .product-card button,
+        .sidebar-item,
+        .footer-section a,
+        nav a {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        /* Product card améliorée */
+        .product-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:active {
+            transform: scale(0.98);
+        }
+        
+        /* Slider amélioré */
+        .slider-img {
+            transition: opacity 0.5s ease-in-out;
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
 
-<!-- Header avec navigation responsive -->
+<!-- Header avec navigation responsive - Version originale restaurée -->
 <header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
     <div class="container mx-auto px-4 py-3">
-        <!-- Ligne supérieure -->
         <div class="flex justify-between items-center flex-wrap gap-3">
             <!-- Logo + menu mobile -->
             <div class="flex items-center gap-3">
@@ -126,7 +228,7 @@
             </h2>
             <a href="pages/vetements.html?cat=homme" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsHomme" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        <div id="productsHomme" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
             <!-- Chargement via JS -->
         </div>
     </section>
@@ -139,7 +241,7 @@
             </h2>
             <a href="pages/vetements.html?cat=femme" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsFemme" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        <div id="productsFemme" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         </div>
     </section>
 
@@ -149,9 +251,9 @@
             <h2 class="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
                 <i class="fas fa-tag text-red-500"></i> Promotions
             </h2>
-            <a href="pages/promos.html" class="text            <a href="pages/promos.html" class="text-red-600 hover:text-red-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
+            <a href="pages/promos.html" class="text-red-600 hover:text-red-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsPromo" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        <div id="productsPromo" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         </div>
     </section>
 
@@ -163,7 +265,7 @@
             </h2>
             <a href="pages/nouveautes.html" class="text-green-600 hover:text-green-700 text-sm">Voir tout <i class="fas fa-arrow-right"></i></a>
         </div>
-        <div id="productsNew" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        <div id="productsNew" class="products-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         </div>
     </section>
 
@@ -235,11 +337,78 @@
 </footer>
 
 <!-- Toast -->
-<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+<div id="toast" class="toast fixed bottom-4 right-4 left-4 sm:left-auto z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm text-center"></div>
 
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/cart.js"></script>
 <script src="js/main.js"></script>
+
+<script>
+// Menu mobile amélioré avec animation (ajouté pour l'adaptation mobile)
+const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+const mobileMenu = document.getElementById('mobileMenu');
+
+if (mobileMenuBtn && mobileMenu) {
+    mobileMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (mobileMenu.classList.contains('hidden')) {
+            mobileMenu.classList.remove('hidden');
+            setTimeout(() => {
+                mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+            }, 10);
+        } else {
+            mobileMenu.style.maxHeight = '0';
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.style.maxHeight = '';
+            }, 300);
+        }
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.style.maxHeight = '0';
+            setTimeout(() => {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.style.maxHeight = '';
+            }, 300);
+        });
+    });
+}
+
+document.addEventListener('click', function(event) {
+    if (mobileMenu && !mobileMenu.classList.contains('hidden') && !mobileMenuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
+        mobileMenu.style.maxHeight = '0';
+        setTimeout(() => {
+            mobileMenu.classList.add('hidden');
+            mobileMenu.style.maxHeight = '';
+        }, 300);
+    }
+});
+
+// Slider amélioré avec gestes tactiles (ajouté pour l'adaptation mobile)
+let touchStartX = 0;
+let touchEndX = 0;
+
+const sliderContainer = document.querySelector('.relative.h-56');
+if (sliderContainer) {
+    sliderContainer.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+    });
+    
+    sliderContainer.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        const diff = touchStartX - touchEndX;
+        if (Math.abs(diff) > 50) {
+            if (diff > 0) {
+                document.getElementById('nextSlide')?.click();
+            } else {
+                document.getElementById('prevSlide')?.click();
+            }
+        }
+    });
+}
+</script>
 </body>
 </html>

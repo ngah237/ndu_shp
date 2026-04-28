@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accessoires - ModeStyle</title>
+    <title>Promotions - ModeStyle</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-gray-100">
 
 <header class="bg-green-700 text-white sticky top-0 z-50 shadow-lg">
     <div class="container mx-auto px-4 py-3">
         <div class="flex justify-between items-center">
-            <a href="../index.html" class="text-xl font-bold">ModeStyle</a>
+            <a href="../index.html" class="text-2xl font-bold">ModeStyle</a>
+            <div class="hidden md:flex items-center gap-6">
+                <a href="../index.html" class="hover:text-green-200">Accueil</a>
+                <a href="vetements.html" class="hover:text-green-200">Vêtements</a>
+                <a href="chaussures.html" class="hover:text-green-200">Chaussures</a>
+                <a href="accessoires.html" class="hover:text-green-200">Accessoires</a>
+                <a href="lingerie.html" class="hover:text-green-200">Lingerie</a>
+                <a href="promos.html" class="text-yellow-300 font-semibold">Promos                <a href="promos.html" class="text-yellow-300 font-semibold">Promos</a>
+                <a href="nouveautes.html" class="hover:text-green-200">Nouveautés</a>
+            </div>
             <div class="flex items-center gap-4">
-                <a href="../index.html" class="hover:text-green-200">
-                    <i class="fas fa-home"></i> Accueil
-                </a>
-                <a href="cart.html" class="hover:text-green-200 relative">
+                <a href="cart.html" class="relative hover:text-green-200">
                     <i class="fas fa-shopping-cart text-xl"></i>
                     <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center hidden">0</span>
+                </a>
+                <a href="favoris.html" class="hover:text-green-200">
+                    <i class="far fa-heart text-xl"></i>
                 </a>
             </div>
         </div>
@@ -28,72 +36,80 @@
 </header>
 
 <main class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Accessoires</h1>
-    
-    <div id="productsContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <div class="col-span-full text-center py-12 text-gray-500">
-            <i class="fas fa-spinner fa-spin text-3xl mb-3 block"></i>
-            <p>Chargement des produits...</p>
+    <h1 class="text-3xl md:text-4xl font-bold text-gray-800 mb-2">🔥 Promotions</h1>
+    <p class="text-gray-500 mb-8">Profitez de nos offres exceptionnelles à prix réduits</p>
+
+    <!-- Filtres -->
+    <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <div class="flex flex-wrap gap-4">
+            <select id="categoryFilter" class="px-3 py-2 border rounded-lg">
+                <option value="all">Toutes catégories</option>
+                <option value="homme">Homme</option>
+                <option value="femme">Femme</option>
+                <option value="enfant">Enfant</option>
+                <option value="chaussures">Chaussures</option>
+                <option value="accessoires">Accessoires</option>
+            </select>
+            <input type="text" id="searchFilter" placeholder="Rechercher une promotion..." class="px-3 py-2 border rounded-lg flex-1">
+            <button id="resetFilters" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Réinitialiser</button>
         </div>
     </div>
-</main>
 
-<!-- Toast -->
-<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+    <!-- Produits en Promotion -->
+    <div id="promosGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+</main>
 
 <script src="../js/api.js"></script>
 <script src="../js/auth.js"></script>
 <script src="../js/cart.js"></script>
 <script>
-// Pour accessoires.html - catégorie 'accessoires'
-const CATEGORY = 'accessoires';
+const promos = [
+    { id: "promo_001", name: "Chemise homme", price: 12000, oldPrice: 20000, image: "https://images.unsplash.com/photo-1596755094514-f4b8e5c0c6c0?w=400", category: "homme", discount: 40 },
+    { id: "promo_002", name: "Robe femme élégante", price: 18000, oldPrice: 35000, image: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400", category: "femme", discount: 49 },
+    { id: "promo_003", name: "Basket running homme", price: 25000, oldPrice: 45000, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400", category: "chaussures", discount: 44 },
+    { id: "promo_004", name: "Montre connectée", price: 45000, oldPrice: 80000, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400", category: "accessoires", discount: 44 },
+    { id: "promo_005", name: "Ensemble lingerie", price: 12000, oldPrice: 25000, image: "https://images.unsplash.com/photo-1620916566392-39f1143ab5be?w=400", category: "lingerie", discount: 52 },
+    { id: "promo_006", name: "Jean slim femme", price: 15000, oldPrice: 28000, image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=400", category: "femme", discount: 46 },
+    { id: "promo_007", name: "T-shirt enfant", price: 6000, oldPrice: 12000, image: "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=400", category: "enfant", discount: 50 },
+    { id: "promo_008", name: "Sac à main cuir", price: 22000, oldPrice: 45000, image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400", category: "accessoires", discount: 51 },
+    { id: "promo_009", name: "Basket enfant", price: 15000, oldPrice: 28000, image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400", category: "chaussures", discount: 46 },
+    { id: "promo_010", name: "Veste en cuir homme", price: 55000, oldPrice: 95000, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400", category: "homme", discount: 42 },
+    { id: "promo_011", name: "Bottes femme", price: 35000, oldPrice: 65000, image: "https://images.unsplash.com/photo-1608250176242-3c8cbb3d2df3?w=400", category: "chaussures", discount: 46 },
+    { id: "promo_012", name: "Lunettes de soleil", price: 15000, oldPrice: 30000, image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400", category: "accessoires", discount: 50 },
+    { id: "promo_013", name: "Pull col roulé homme", price: 25000, oldPrice: 45000, image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400", category: "homme", discount: 44 },
+    { id: "promo_014", name: "Jupe plissée femme", price: 12000, oldPrice: 22000, image: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=400", category: "femme", discount: 45 },
+    { id: "promo_015", name: "Mocassins homme", price: 22000, oldPrice: 38000, image: "https://images.unsplash.com/photo-1533867617858-e7b97e60f2e1?w=400", category: "chaussures", discount: 42 }
+];
 
-async function loadProducts() {
-    try {
-        const products = await getProductsByCategory(CATEGORY);
-        displayProducts(products);
-    } catch (error) {
-        document.getElementById('productsContainer').innerHTML = `
-            <div class="col-span-full text-center py-12 text-red-500">
-                <i class="fas fa-exclamation-triangle text-5xl mb-3 block"></i>
-                <p>Erreur lors du chargement</p>
-                <button onclick="loadProducts()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-lg">Réessayer</button>
-            </div>
-        `;
-    }
-}
+let filteredPromos = [...promos];
 
-function displayProducts(products) {
-    const container = document.getElementById('productsContainer');
-    
-    if (!products || products.length === 0) {
-        container.innerHTML = `
-            <div class="col-span-full text-center py-12 text-gray-500">
-                <i class="fas fa-search text-5xl mb-3 block text-gray-300"></i>
-                <p>Aucun produit trouvé dans cette catégorie</p>
-            </div>
-        `;
+function displayPromos(products) {
+    const container = document.getElementById('promosGrid');
+    if (!products.length) {
+        container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">🏷️ Aucune promotion pour le moment</div>';
         return;
     }
     
-    container.innerHTML = products.map(product => `
-        <div class="bg-white rounded-lg shadow-md overflow-hidden group">
-            <a href="product-details.html?id=${product._id}">
-                <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover group-hover:scale-105 transition duration-300">
-            </a>
+    container.innerHTML = products.map(p => `
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition group">
+            <div class="relative">
+                <span class="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">-${p.discount}%</span>
+                <a href="product-details.html?id=${p.id}">
+                    <img src="${p.image}" class="w-full h-40 object-cover group-hover:scale-105 transition duration-300">
+                </a>
+            </div>
             <div class="p-3">
-                <h3 class="font-semibold text-gray-800 truncate">${product.name}</h3>
+                <h3 class="font-semibold text-gray-800 text-sm truncate">${p.name}</h3>
                 <div class="flex items-center gap-2 mt-1">
-                    ${product.oldPrice ? `<span class="text-gray-400 line-through text-xs">${product.oldPrice.toLocaleString()} FCFA</span>` : ''}
-                    <p class="text-green-600 font-bold">${product.price.toLocaleString()} FCFA</p>
+                    <span class="text-green-600 font-bold text-sm">${p.price.toLocaleString()} FCFA</span>
+                    <span class="text-gray-400 line-through text-xs">${p.oldPrice.toLocaleString()} FCFA</span>
                 </div>
-                ${product.isPromo ? '<span class="inline-block bg-red-500 text-white text-xs px-2 py-0.5 rounded-full mt-1">Promo</span>' : ''}
-                <div class="flex gap-2 mt-3">
-                    <button onclick="addToCartUI('${product._id}', '${product.name}', ${product.price}, 1, '', '', '${product.image}')" 
-                            class="flex-1 bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition text-sm">
+                <div class="flex gap-2 mt-2">
+                    <button onclick="addToCartUI('${p.id}', '${p.name}', ${p.price}, 1, '', '', '${p.image}')" 
+                            class="flex-1 bg-green-600 text-white py-1.5 rounded-lg hover:bg-green-700 transition text-xs">
                         <i class="fas fa-shopping-cart"></i> Acheter
                     </button>
-                    <button onclick="toggleFavoriteUI('${product._id}', this)" 
+                    <button onclick="toggleFavorite('${p.id}', '${p.name}', ${p.price}, '${p.image}')" 
                             class="favorite-btn text-gray-400 hover:text-red-500 p-1.5 border rounded-lg">
                         <i class="far fa-heart"></i>
                     </button>
@@ -103,55 +119,66 @@ function displayProducts(products) {
     `).join('');
 }
 
-async function toggleFavoriteUI(productId, btnElement) {
-    if (!isLoggedIn()) {
-        showToast('Veuillez vous connecter', true);
-        setTimeout(() => {
-            window.location.href = 'login.html';
-        }, 1500);
-        return;
-    }
+function applyFilters() {
+    const category = document.getElementById('categoryFilter').value;
+    const search = document.getElementById('searchFilter').value.toLowerCase();
     
-    try {
-        const result = await toggleFavorite(productId);
-        const icon = btnElement.querySelector('i');
-        if (result.isFavorite) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-            btnElement.classList.add('text-red-500');
-            showToast('Ajouté aux favoris');
-        } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
-            btnElement.classList.remove('text-red-500');
-            showToast('Retiré des favoris');
-        }
-    } catch (error) {
-        showToast(error.message, true);
-    }
+    let filtered = [...promos];
+    if (category !== 'all') filtered = filtered.filter(p => p.category === category);
+    if (search) filtered = filtered.filter(p => p.name.toLowerCase().includes(search));
+    
+    displayPromos(filtered);
 }
 
-function showToast(message, isError = false) {
-    const toast = document.getElementById('toast');
+function toggleFavorite(id, name, price, image) {
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const exists = favorites.find(f => f.id === id);
+    if (exists) {
+        favorites = favorites.filter(f => f.id !== id);
+        showToast("❌ Retiré des favoris");
+    } else {
+        favorites.push({ id, name, price, image });
+        showToast("❤️ Ajouté aux favoris");
+    }
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    updateFavCount();
+}
+
+function showToast(message) {
+    let toast = document.getElementById('toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.className = 'fixed bottom-4 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm';
+        document.body.appendChild(toast);
+    }
     toast.textContent = message;
-    toast.className = `fixed bottom-4 right-4 z-50 ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm toast-slide`;
     toast.classList.remove('hidden');
-    setTimeout(() => {
-        toast.classList.add('hidden');
-    }, 3000);
+    setTimeout(() => toast.classList.add('hidden'), 3000);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
-    if (isLoggedIn()) {
-        loadCart();
+function updateFavCount() {
+    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+    const count = favorites.length;
+    const favSpan = document.getElementById('favCount');
+    if (favSpan) {
+        favSpan.textContent = count;
+        favSpan.classList.toggle('hidden', count === 0);
     }
+}
+
+document.getElementById('categoryFilter').addEventListener('change', applyFilters);
+document.getElementById('searchFilter').addEventListener('input', applyFilters);
+document.getElementById('resetFilters').addEventListener('click', () => {
+    document.getElementById('categoryFilter').value = 'all';
+    document.getElementById('searchFilter').value = '';
+    applyFilters();
 });
+
+displayPromos(promos);
+updateFavCount();
 </script>
+
+<div id="toast" class="fixed bottom-4 right-4 z-50 hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
 </body>
 </html>
-const CATEGORY = 'promo';
-async function loadProducts() {
-    const products = await getPromoProducts();
-    displayProducts(products);
-}
