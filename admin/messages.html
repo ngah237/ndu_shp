@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - ModeStyle Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+    <style>
+        .sidebar-item:hover { background-color: #374151; }
+        .message-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .message-card:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .toast { position: fixed; bottom: 20px; right: 20px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .dark { background-color: #1a1a2e; color: #eee; }
+        .dark .bg-white { background-color: #16213e; color: #eee; }
+        .dark .bg-gray-50 { background-color: #0f3460; }
+        .dark .text-gray-700, .dark .text-gray-600 { color: #ccc; }
+        .dark .border-gray-200 { border-color: #2c3e50; }
+        .dark .bg-gray-100 { background-color: #1e2a3a; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-gray-800 text-white flex flex-col">
+        <div class="p-4 border-b border-gray-700">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-store text-2xl text-green-400"></i>
+                <span class="text-xl font-bold">ModeStyle Admin</span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="dashboard.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-chart-line w-5"></i> Dashboard
+            </a>
+            <a href="produits.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-box w-5"></i> Produits
+            </a>
+            <a href="commandes.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-shopping-cart w-5"></i> Commandes
+            </a>
+            <a href="clients.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-users w-5"></i> Clients
+            </a>
+            <a href="promo-codes.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-tag w-5"></i> Codes promo
+            </a>
+            <a href="messages.html" class="sidebar-item flex items-center gap-3 px-4 py-3 bg-green-700 rounded-lg">
+                <i class="fas fa-envelope w-5"></i> Messages
+                <span id="unreadBadge" class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-user-circle text-2xl"></i>
+                <div>
+                    <p id="adminName" class="font-semibold">Admin</p>
+                    <p id="adminEmail" class="text-xs text-gray-400">admin@modestyle.com</p>
+                </div>
+            </div>
+            <div class="flex gap-2 mb-3">
+                <button id="darkModeToggle" class="flex-1 flex items-center justify-center gap-2 bg-gray-700 px-3 py-2 rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-moon"></i> <span class="text-sm">Sombre</span>
+                </button>
+            </div>
+            <button id="logoutBtn" class="w-full flex items-center justify-center gap-2 bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">📩 Gestion des messages</h1>
+                    <p class="text-gray-500">Consultez et répondez aux messages de vos clients</p>
+                </div>
+                <div class="flex gap-2">
+                    <button id="markAllRead" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+                        <i class="fas fa-check-double"></i> Tout lire
+                    </button>
+                    <button id="deleteAllBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-700">
+                        <i class="fas fa-trash-alt"></i> Tout supprimer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statistiques messages -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Total messages</p>
+                            <p id="totalMessages" class="text-2xl font-bold text-blue-600">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-envelope text-blue-600"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Non lus</p>
+                            <p id="unreadCount" class="text-2xl font-bold text-red-600">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-envelope-open-text text-red-600"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Ce mois</p>
+                            <p id="monthCount" class="text-2xl font-bold text-green-600">0</p>
+                        </div>
+                        <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-calendar-alt text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">Dernier message</p>
+                            <p id="lastDate" class="text-sm font-semibold text-gray-700">-</p>
+                        </div>
+                        <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-clock text-purple-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtres -->
+            <div class="bg-white rounded-xl shadow p-4 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                    <select id="statusFilter" class="border rounded-lg px-3 py-2">
+                        <option value="all">Tous les messages</option>
+                        <option value="unread">Non lus</option>
+                        <option value="read">Lus</option>
+                    </select>
+                    <select id="subjectFilter" class="border rounded-lg px-3 py-2">
+                        <option value="all">Tous les sujets</option>
+                        <option value="commande">Commande</option>
+                        <option value="retour">Retour produit</option>
+                        <option value="livraison">Livraison</option>
+                        <option value="produit">Information produit</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                    <input type="text" id="searchFilter" placeholder="Rechercher par nom, email..." class="border rounded-lg px-3 py-2">
+                    <button id="applyFilters" class="bg-green-600 text-white rounded-lg px-4 py-2 hover:bg-green-700">Filtrer</button>
+                </div>
+            </div>
+
+            <!-- Liste des messages -->
+            <div id="messagesContainer" class="space-y-4">
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i>
+                    Chargement des messages...
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal de réponse au message -->
+<div id="replyModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-xl max-w-md w-full mx-4 p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-800">
+                <i class="fas fa-reply text-green-600 mr-2"></i> Répondre au message
+            </h2>
+            <button onclick="closeReplyModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <div class="mb-4">
+            <p class="text-sm text-gray-600 mb-1">À: <span id="replyTo" class="font-semibold"></span></p>
+            <p class="text-sm text-gray-600 mb-3">Sujet: <span id="replySubject" class="font-semibold"></span></p>
+        </div>
+        
+        <textarea id="replyMessage" rows="5" placeholder="Votre réponse..." 
+                  class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+        
+        <div class="flex gap-3 mt-4">
+            <button onclick="sendReply()" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700">
+                <i class="fas fa-paper-plane"></i> Envoyer
+            </button>
+            <button onclick="closeReplyModal()" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-400">
+                Annuler
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation suppression -->
+<div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-xl max-w-sm w-full mx-4 p-6">
+        <div class="text-center mb-4">
+            <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-3"></i>
+            <h2 class="text-xl font-bold text-gray-800">Confirmation</h2>
+            <p id="confirmMessage" class="text-gray-600 mt-2">Êtes-vous sûr de vouloir supprimer ce message ?</p>
+        </div>
+        <div class="flex gap-3">
+            <button id="confirmYes" class="flex-1 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700">Supprimer</button>
+            <button id="confirmNo" class="flex-1 bg-gray-300 text-gray-700 py-2 rounded-lg font-semibold hover:bg-gray-400">Annuler</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script>
+let allMessages = [];
+let currentDeleteId = null;
+let currentReplyMessage = null;
+
+// ==================== FONCTIONS UTILITAIRES ====================
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm`;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+function logout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminInfo');
+    window.location.href = 'login.html';
+}
+
+function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        window.location.href = 'login.html';
+        return false;
+    }
+    return true;
+}
+
+// ==================== GESTION DES MESSAGES ====================
+function loadMessages() {
+    const savedMessages = localStorage.getItem('contactMessages');
+    allMessages = savedMessages ? JSON.parse(savedMessages) : [];
+    
+    // Ajouter des exemples si vide
+    if (allMessages.length === 0) {
+        allMessages = [
+            { id: Date.now() + 1, name: "Jean Dupont", email: "jean.dupont@email.com", phone: "612345678", subject: "commande", message: "Je n'ai pas reçu ma commande passée il y a 5 jours. Pouvez-vous me donner des nouvelles ?", date: new Date(Date.now() - 2*24*60*60*1000).toISOString(), read: false },
+            { id: Date.now() + 2, name: "Marie Claire", email: "marie.claire@email.com", phone: "698765432", subject: "retour", message: "Je souhaite retourner un produit qui ne correspond pas à ma taille. Comment procéder ?", date: new Date(Date.now() - 5*24*60*60*1000).toISOString(), read: false },
+            { id: Date.now() + 3, name: "Paul Kamga", email: "paul.kamga@email.com", phone: "677889900", subject: "livraison", message: "Les frais de livraison sont-ils gratuits à partir de quel montant ?", date: new Date(Date.now() - 7*24*60*60*1000).toISOString(), read: true }
+        ];
+        localStorage.setItem('contactMessages', JSON.stringify(allMessages));
+    }
+    
+    updateStats();
+    applyFilters();
+}
+
+function saveMessages() {
+    localStorage.setItem('contactMessages', JSON.stringify(allMessages));
+    updateStats();
+    applyFilters();
+}
+
+function updateStats() {
+    const total = allMessages.length;
+    const unread = allMessages.filter(m => !m.read).length;
+    const thisMonth = allMessages.filter(m => new Date(m.date).getMonth() === new Date().getMonth()).length;
+    const lastDate = allMessages.length > 0 ? new Date(Math.max(...allMessages.map(m => new Date(m.date)))).toLocaleDateString() : '-';
+    
+    document.getElementById('totalMessages').textContent = total;
+    document.getElementById('unreadCount').textContent = unread;
+    document.getElementById('monthCount').textContent = thisMonth;
+    document.getElementById('lastDate').textContent = lastDate;
+    document.getElementById('unreadBadge').textContent = unread;
+    document.getElementById('unreadBadge').classList.toggle('hidden', unread === 0);
+}
+
+function applyFilters() {
+    const status = document.getElementById('statusFilter').value;
+    const subject = document.getElementById('subjectFilter').value;
+    const search = document.getElementById('searchFilter').value.toLowerCase();
+    
+    let filtered = [...allMessages];
+    
+    if (status === 'unread') filtered = filtered.filter(m => !m.read);
+    if (status === 'read') filtered = filtered.filter(m => m.read);
+    if (subject !== 'all') filtered = filtered.filter(m => m.subject === subject);
+    if (search) filtered = filtered.filter(m => m.name.toLowerCase().includes(search) || m.email.toLowerCase().includes(search) || m.message.toLowerCase().includes(search));
+    
+    displayMessages(filtered);
+}
+
+function getSubjectText(subject) {
+    const subjects = { commande: '🛒 Commande', retour: '🔄 Retour produit', livraison: '🚚 Livraison', produit: '📦 Information produit', autre: '📝 Autre' };
+    return subjects[subject] || subject;
+}
+
+function getSubjectColor(subject) {
+    const colors = { commande: 'bg-blue-100 text-blue-800', retour: 'bg-yellow-100 text-yellow-800', livraison: 'bg-green-100 text-green-800', produit: 'bg-purple-100 text-purple-800', autre: 'bg-gray-100 text-gray-800' };
+    return colors[subject] || 'bg-gray-100';
+}
+
+function displayMessages(messages) {
+    const container = document.getElementById('messagesContainer');
+    
+    if (!messages.length) {
+        container.innerHTML = `
+            <div class="text-center py-12 text-gray-500">
+                <i class="fas fa-inbox text-5xl mb-3 block text-gray-300"></i>
+                <p>Aucun message trouvé</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = messages.map(msg => `
+        <div class="message-card bg-white rounded-xl shadow-md overflow-hidden ${!msg.read ? 'border-l-4 border-green-500' : ''}">
+            <div class="p-5">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                            <i class="fas fa-user text-gray-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">${escapeHtml(msg.name)}</h3>
+                            <p class="text-sm text-gray-500">${escapeHtml(msg.email)} ${msg.phone ? '• ' + msg.phone : ''}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-1 rounded-full text-xs ${getSubjectColor(msg.subject)}">${getSubjectText(msg.subject)}</span>
+                        <span class="text-xs text-gray-400">${new Date(msg.date).toLocaleDateString()} à ${new Date(msg.date).toLocaleTimeString()}</span>
+                    </div>
+                </div>
+                
+                <p class="text-gray-600 mb-4">${escapeHtml(msg.message)}</p>
+                
+                <div class="flex gap-3 pt-3 border-t">
+                    <button onclick="markAsRead('${msg.id}')" class="text-green-600 hover:text-green-800 text-sm ${msg.read ? 'hidden' : ''}">
+                        <i class="fas fa-check-circle"></i> Marquer comme lu
+                    </button>
+                    <button onclick="openReplyModal('${msg.id}')" class="text-blue-600 hover:text-blue-800 text-sm">
+                        <i class="fas fa-reply"></i> Répondre
+                    </button>
+                    <button onclick="deleteMessage('${msg.id}')" class="text-red-600 hover:text-red-800 text-sm">
+                        <i class="fas fa-trash-alt"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function markAsRead(id) {
+    const msg = allMessages.find(m => m.id == id);
+    if (msg && !msg.read) {
+        msg.read = true;
+        saveMessages();
+        showToast('Message marqué comme lu');
+    }
+}
+
+function markAllAsRead() {
+    allMessages.forEach(m => m.read = true);
+    saveMessages();
+    showToast('Tous les messages ont été marqués comme lus');
+}
+
+function openReplyModal(id) {
+    const msg = allMessages.find(m => m.id == id);
+    if (msg) {
+        currentReplyMessage = msg;
+        document.getElementById('replyTo').textContent = msg.email;
+        document.getElementById('replySubject').textContent = `Re: ${getSubjectText(msg.subject)}`;
+        document.getElementById('replyMessage').value = '';
+        document.getElementById('replyModal').classList.add('flex');
+        document.getElementById('replyModal').classList.remove('hidden');
+    }
+}
+
+function closeReplyModal() {
+    document.getElementById('replyModal').classList.add('hidden');
+    document.getElementById('replyModal').classList.remove('flex');
+    currentReplyMessage = null;
+}
+
+function sendReply() {
+    const replyText = document.getElementById('replyMessage').value;
+    if (!replyText.trim()) {
+        showToast('Veuillez écrire une réponse', true);
+        return;
+    }
+    
+    // Simulation d'envoi d'email
+    showToast(`✅ Réponse envoyée à ${currentReplyMessage.email}`);
+    
+    // Marquer comme lu
+    markAsRead(currentReplyMessage.id);
+    closeReplyModal();
+}
+
+function deleteMessage(id) {
+    currentDeleteId = id;
+    document.getElementById('confirmMessage').textContent = 'Êtes-vous sûr de vouloir supprimer ce message ?';
+    document.getElementById('confirmModal').classList.add('flex');
+    document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function confirmDelete() {
+    if (currentDeleteId) {
+        allMessages = allMessages.filter(m => m.id != currentDeleteId);
+        saveMessages();
+        showToast('Message supprimé');
+        currentDeleteId = null;
+        closeConfirmModal();
+    }
+}
+
+function deleteAllMessages() {
+    if (allMessages.length === 0) {
+        showToast('Aucun message à supprimer', true);
+        return;
+    }
+    currentDeleteId = 'all';
+    document.getElementById('confirmMessage').textContent = `Êtes-vous sûr de vouloir supprimer les ${allMessages.length} messages ? Cette action est irréversible.`;
+    document.getElementById('confirmModal').classList.add('flex');
+    document.getElementById('confirmModal').classList.remove('hidden');
+}
+
+function confirmDeleteAll() {
+    allMessages = [];
+    saveMessages();
+    showToast('Tous les messages ont été supprimés');
+    currentDeleteId = null;
+    closeConfirmModal();
+}
+
+function closeConfirmModal() {
+    document.getElementById('confirmModal').classList.add('hidden');
+    document.getElementById('confirmModal').classList.remove('flex');
+    currentDeleteId = null;
+}
+
+// ==================== MODE SOMBRE ====================
+function initDarkMode() {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) document.body.classList.add('dark');
+    document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        showToast(document.body.classList.contains('dark') ? '🌙 Mode sombre activé' : '☀️ Mode clair activé');
+    });
+}
+
+// ==================== INITIALISATION ====================
+if (checkAuth()) {
+    const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+    document.getElementById('adminName').textContent = adminInfo.name || 'Administrateur';
+    document.getElementById('adminEmail').textContent = adminInfo.email || 'admin@modestyle.com';
+    
+    loadMessages();
+    initDarkMode();
+}
+
+document.getElementById('logoutBtn')?.addEventListener('click', (e) => { e.preventDefault(); logout(); });
+document.getElementById('markAllRead')?.addEventListener('click', markAllAsRead);
+document.getElementById('deleteAllBtn')?.addEventListener('click', deleteAllMessages);
+document.getElementById('applyFilters')?.addEventListener('click', applyFilters);
+document.getElementById('searchFilter')?.addEventListener('input', applyFilters);
+document.getElementById('confirmYes')?.addEventListener('click', () => {
+    if (currentDeleteId === 'all') confirmDeleteAll();
+    else confirmDelete();
+});
+document.getElementById('confirmNo')?.addEventListener('click', closeConfirmModal);
+</script>
+</body>
+</html>

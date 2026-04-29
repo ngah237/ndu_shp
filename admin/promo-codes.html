@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codes promo - ModeStyle Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v6.5.1/css/all.css">
+    <style>
+        .sidebar-item:hover { background-color: #374151; }
+        .stats-card { transition: transform 0.2s; }
+        .stats-card:hover { transform: translateY(-5px); }
+        .toast { position: fixed; bottom: 20px; right: 20px; z-index: 1000; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .dark { background-color: #1a1a2e; color: #eee; }
+        .dark .bg-white { background-color: #16213e; color: #eee; }
+        .dark .bg-gray-50 { background-color: #0f3460; }
+        .dark .text-gray-800 { color: #eee; }
+        .dark .text-gray-500 { color: #aaa; }
+        .dark .border-gray-200 { border-color: #2c3e50; }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-gray-800 text-white flex flex-col">
+        <div class="p-4 border-b border-gray-700">
+            <div class="flex items-center gap-3">
+                <i class="fas fa-store text-2xl text-green-400"></i>
+                <span class="text-xl font-bold">ModeStyle Admin</span>
+            </div>
+        </div>
+        
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="dashboard.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-chart-line w-5"></i> Dashboard
+            </a>
+            <a href="produits.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-box w-5"></i> Produits
+            </a>
+            <a href="commandes.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-shopping-cart w-5"></i> Commandes
+            </a>
+            <a href="clients.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-users w-5"></i> Clients
+            </a>
+            <a href="promo-codes.html" class="sidebar-item flex items-center gap-3 px-4 py-3 bg-green-700 rounded-lg">
+                <i class="fas fa-tag w-5"></i> Codes promo
+            </a>
+            <a href="messages.html" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-700">
+                <i class="fas fa-envelope w-5"></i> Messages
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-700">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-user-circle text-2xl"></i>
+                <div>
+                    <p id="adminName" class="font-semibold">Admin</p>
+                    <p id="adminEmail" class="text-xs text-gray-400">admin@modestyle.com</p>
+                </div>
+            </div>
+            <div class="flex gap-2 mb-3">
+                <button id="darkModeToggle" class="flex-1 flex items-center justify-center gap-2 bg-gray-700 px-3 py-2 rounded-lg hover:bg-gray-600 transition">
+                    <i class="fas fa-moon"></i> <span class="text-sm">Sombre</span>
+                </button>
+            </div>
+            <button id="logoutBtn" class="w-full flex items-center justify-center gap-2 bg-red-600 px-4 py-2 rounded-lg hover:bg-red-700 transition">
+                <i class="fas fa-sign-out-alt"></i> Déconnexion
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">🏷️ Codes promotionnels</h1>
+                <p class="text-gray-500">Créez et gérez vos codes de réduction</p>
+            </div>
+            <button id="addPromoBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-plus mr-2"></i> Nouveau code
+            </button>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="stats-card bg-white rounded-xl shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total codes</p>
+                        <p id="totalCodes" class="text-2xl font-bold text-blue-600">0</p>
+                    </div>
+                    <i class="fas fa-tag text-2xl text-blue-400"></i>
+                </div>
+            </div>
+            <div class="stats-card bg-white rounded-xl shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Codes actifs</p>
+                        <p id="activeCodes" class="text-2xl font-bold text-green-600">0</p>
+                    </div>
+                    <i class="fas fa-check-circle text-2xl text-green-400"></i>
+                </div>
+            </div>
+            <div class="stats-card bg-white rounded-xl shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Codes expirés</p>
+                        <p id="expiredCodes" class="text-2xl font-bold text-red-600">0</p>
+                    </div>
+                    <i class="fas fa-clock text-2xl text-red-400"></i>
+                </div>
+            </div>
+            <div class="stats-card bg-white rounded-xl shadow p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Utilisations totales</p>
+                        <p id="totalUses" class="text-2xl font-bold text-purple-600">0</p>
+                    </div>
+                    <i class="fas fa-chart-line text-2xl text-purple-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <div id="promoForm" class="bg-white rounded-xl shadow p-6 mb-6 hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                    <i class="fas fa-plus-circle text-green-600 mr-2"></i> Ajouter un code promo
+                </h2>
+                <button id="closeFormBtn" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Code *</label>
+                    <input type="text" id="promoCode" placeholder="EX: BIENVENUE10" class="w-full border rounded-lg px-3 py-2 uppercase focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <p class="text-xs text-gray-400 mt-1">Le code sera automatiquement mis en majuscules</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Type de réduction *</label>
+                    <select id="promoType" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <option value="percent">Pourcentage (%)</option>
+                        <option value="fixed">Montant fixe (FCFA)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Valeur *</label>
+                    <input type="number" id="promoValue" placeholder="10" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Date d'expiration *</label>
+                    <input type="date" id="promoEndDate" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Montant minimum (FCFA)</label>
+                    <input type="number" id="promoMinAmount" value="0" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <p class="text-xs text-gray-400 mt-1">Laisser 0 pour aucun minimum</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Utilisation maximum</label>
+                    <input type="number" id="promoUsageLimit" placeholder="Illimité" class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <p class="text-xs text-gray-400 mt-1">Laisser vide pour illimité</p>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-6">
+                <button id="savePromoBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition">
+                    <i class="fas fa-save mr-2"></i> Enregistrer
+                </button>
+                <button id="cancelPromoBtn" class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold hover:bg-gray-400 transition">
+                    Annuler
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtres -->
+        <div class="bg-white rounded-xl shadow p-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <select id="statusFilter" class="border rounded-lg px-3 py-2">
+                    <option value="all">Tous les codes</option>
+                    <option value="active">Actifs</option>
+                    <option value="expired">Expirés</option>
+                </select>
+                <input type="text" id="searchFilter" placeholder="Rechercher un code..." class="border rounded-lg px-3 py-2">
+                <button id="resetFilters" class="bg-gray-200 text-gray-700 rounded-lg px-4 py-2 hover:bg-gray-300 transition">
+                    <i class="fas fa-undo-alt mr-2"></i> Réinitialiser
+                </button>
+            </div>
+        </div>
+
+        <!-- Liste des codes promo -->
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-3 text-left text-sm font-semibold">Code</th>
+                            <th class="p-3 text-left text-sm font-semibold">Réduction</th>
+                            <th class="p-3 text-left text-sm font-semibold">Mini commande</th>
+                            <th class="p-3 text-left text-sm font-semibold">Expiration</th>
+                            <th class="p-3 text-center text-sm font-semibold">Utilisations</th>
+                            <th class="p-3 text-center text-sm font-semibold">Statut</th>
+                            <th class="p-3 text-center text-sm font-semibold">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promosList">
+                        <tr><td colspan="7" class="text-center py-8 text-gray-500">
+                            <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i>
+                            Chargement des codes promo...
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast hidden bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm"></div>
+
+<script>
+const API_URL = 'http://localhost:5000/api';
+let allPromoCodes = [];
+
+// ==================== FONCTIONS UTILITAIRES ====================
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${isError ? 'bg-red-600' : 'bg-green-600'} text-white px-4 py-2 rounded-lg shadow-lg text-sm`;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+function logout() {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminInfo');
+    window.location.href = 'login.html';
+}
+
+function checkAuth() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+        window.location.href = 'login.html';
+        return false;
+    }
+    return true;
+}
+
+// ==================== CHARGEMENT DES CODES PROMO ====================
+async function loadPromoCodes() {
+    const token = localStorage.getItem('adminToken');
+    if (!token) return;
+    
+    try {
+        const res = await fetch(`${API_URL}/admin/promocodes`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.status === 401 || res.status === 403) {
+            logout();
+            return;
+        }
+        
+        allPromoCodes = await res.json();
+        updateStats();
+        applyFilters();
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('promosList').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-red-500">❌ Erreur de chargement</td>' + '</tr>';
+    }
+}
+
+function updateStats() {
+    const total = allPromoCodes.length;
+    const active = allPromoCodes.filter(p => p.isActive && new Date(p.endDate) > new Date()).length;
+    const expired = allPromoCodes.filter(p => !p.isActive || new Date(p.endDate) <= new Date()).length;
+    const totalUses = allPromoCodes.reduce((sum, p) => sum + (p.usedCount || 0), 0);
+    
+    document.getElementById('totalCodes').textContent = total;
+    document.getElementById('activeCodes').textContent = active;
+    document.getElementById('expiredCodes').textContent = expired;
+    document.getElementById('totalUses').textContent = totalUses;
+}
+
+function applyFilters() {
+    const status = document.getElementById('statusFilter').value;
+    const search = document.getElementById('searchFilter').value.toLowerCase();
+    
+    let filtered = [...allPromoCodes];
+    
+    if (status === 'active') {
+        filtered = filtered.filter(p => p.isActive && new Date(p.endDate) > new Date());
+    } else if (status === 'expired') {
+        filtered = filtered.filter(p => !p.isActive || new Date(p.endDate) <= new Date());
+    }
+    
+    if (search) {
+        filtered = filtered.filter(p => p.code.toLowerCase().includes(search));
+    }
+    
+    displayPromoCodes(filtered);
+}
+
+function displayPromoCodes(promos) {
+    const tbody = document.getElementById('promosList');
+    if (!promos.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-500">📭 Aucun code promo trouvé</td>' + '</tr>';
+        return;
+    }
+    
+    tbody.innerHTML = promos.map(promo => {
+        const isExpired = new Date(promo.endDate) <= new Date();
+        const isActive = promo.isActive && !isExpired;
+        
+        return `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-3 font-mono font-bold text-green-600">${promo.code}</td>
+                <td class="p-3">${promo.discountType === 'percent' ? promo.discountValue + '%' : promo.discountValue.toLocaleString() + ' FCFA'}</td>
+                <td class="p-3">${promo.minOrderAmount > 0 ? promo.minOrderAmount.toLocaleString() + ' FCFA' : 'Aucun'}</td>
+                <td class="p-3 ${isExpired ? 'text-red-500' : 'text-gray-600'}">${new Date(promo.endDate).toLocaleDateString()}</td>
+                <td class="p-3 text-center">${promo.usedCount || 0}${promo.usageLimit ? '/' + promo.usageLimit : ''}</td>
+                <td class="p-3 text-center">
+                    <span class="px-2 py-1 rounded-full text-xs ${isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                        ${isActive ? 'Actif' : 'Expiré'}
+                    </span>
+                </td>
+                <td class="p-3 text-center">
+                    <button onclick="deletePromo('${promo._id}')" class="text-red-500 hover:text-red-700 transition mx-1" title="Supprimer">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ==================== GESTION DES CODES PROMO ====================
+async function savePromo() {
+    const code = document.getElementById('promoCode').value.toUpperCase().trim();
+    const discountType = document.getElementById('promoType').value;
+    const discountValue = parseInt(document.getElementById('promoValue').value);
+    const endDate = document.getElementById('promoEndDate').value;
+    const minOrderAmount = parseInt(document.getElementById('promoMinAmount').value) || 0;
+    const usageLimit = document.getElementById('promoUsageLimit').value ? parseInt(document.getElementById('promoUsageLimit').value) : null;
+    
+    if (!code) {
+        showToast('Veuillez entrer un code', true);
+        return;
+    }
+    if (!discountValue || discountValue <= 0) {
+        showToast('Veuillez entrer une valeur valide', true);
+        return;
+    }
+    if (!endDate) {
+        showToast('Veuillez sélectionner une date d\'expiration', true);
+        return;
+    }
+    
+    // Vérifier si le code existe déjà
+    if (allPromoCodes.some(p => p.code === code)) {
+        showToast('Ce code existe déjà', true);
+        return;
+    }
+    
+    const promoData = { code, discountType, discountValue, endDate: new Date(endDate), minOrderAmount, usageLimit };
+    
+    try {
+        const token = localStorage.getItem('adminToken');
+        const res = await fetch(`${API_URL}/admin/promocodes`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify(promoData)
+        });
+        
+        if (res.ok) {
+            showToast('✅ Code promo ajouté avec succès');
+            document.getElementById('promoForm').classList.add('hidden');
+            document.getElementById('promoCode').value = '';
+            document.getElementById('promoValue').value = '';
+            document.getElementById('promoEndDate').value = '';
+            document.getElementById('promoMinAmount').value = '0';
+            document.getElementById('promoUsageLimit').value = '';
+            loadPromoCodes();
+        } else {
+            const error = await res.json();
+            showToast(error.message || 'Erreur lors de l\'ajout', true);
+        }
+    } catch (error) {
+        showToast('Erreur: ' + error.message, true);
+    }
+}
+
+async function deletePromo(id) {
+    if (confirm('Supprimer définitivement ce code promo ?')) {
+        try {
+            const token = localStorage.getItem('adminToken');
+            await fetch(`${API_URL}/admin/promocodes/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            showToast('Code promo supprimé');
+            loadPromoCodes();
+        } catch (error) {
+            showToast('Erreur lors de la suppression', true);
+        }
+    }
+}
+
+// ==================== UI ====================
+function toggleForm() {
+    const form = document.getElementById('promoForm');
+    form.classList.toggle('hidden');
+    if (!form.classList.contains('hidden')) {
+        document.getElementById('promoCode').focus();
+    }
+}
+
+function resetFilters() {
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('searchFilter').value = '';
+    applyFilters();
+}
+
+// ==================== MODE SOMBRE ====================
+function initDarkMode() {
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) document.body.classList.add('dark');
+    document.getElementById('darkModeToggle')?.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+        showToast(document.body.classList.contains('dark') ? '🌙 Mode sombre activé' : '☀️ Mode clair activé');
+    });
+}
+
+// ==================== INITIALISATION ====================
+if (checkAuth()) {
+    const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+    document.getElementById('adminName').textContent = adminInfo.name || 'Administrateur';
+    document.getElementById('adminEmail').textContent = adminInfo.email || 'admin@modestyle.com';
+    
+    loadPromoCodes();
+    initDarkMode();
+}
+
+// Événements
+document.getElementById('addPromoBtn')?.addEventListener('click', toggleForm);
+document.getElementById('closeFormBtn')?.addEventListener('click', toggleForm);
+document.getElementById('cancelPromoBtn')?.addEventListener('click', toggleForm);
+document.getElementById('savePromoBtn')?.addEventListener('click', savePromo);
+document.getElementById('logoutBtn')?.addEventListener('click', (e) => { e.preventDefault(); logout(); });
+document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+document.getElementById('searchFilter')?.addEventListener('input', applyFilters);
+document.getElementById('resetFilters')?.addEventListener('click', resetFilters);
+</script>
+</body>
+</html>
